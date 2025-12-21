@@ -9,8 +9,9 @@ const base =
 
 const variants = {
   primary:
-    'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] focus:ring-[var(--color-primary)]',
-  secondary: 'text-slate-700 no-border',
+    'bg-[var(--color-primary)] text-white focus:ring-[var(--color-primary)] transition-colors duration-1000 ease-out hover:bg-[var(--color-primary-hover)]',
+  secondary:
+    'text-slate-500 no-border transition-colors duration-1000 ease-out hover:text-slate-700',
 };
 
 const Button = ({ label, clickFn, variant = 'primary' }: ButtonProps) => {

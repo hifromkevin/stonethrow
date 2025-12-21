@@ -3,6 +3,12 @@ import { useState } from 'react';
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 
+const handleFocusHeaderStyling = (isOpen: boolean) => {
+  return isOpen
+    ? 'rounded-xl bg-slate-200'
+    : 'rounded-xl bg-slate-100 transition-colors duration-1000 ease-out hover:bg-slate-200 focus:ring-2 focus:ring-[#5FA69A]/40 focus:outline-none disabled:opacity-50';
+};
+
 const FocusCard = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [draft, setDraft] = useState('');
@@ -17,7 +23,7 @@ const FocusCard = () => {
         <h1>What are you focused on right now?</h1>
 
         <Card className="mt-4">
-          <div className="rounded-xl bg-slate-100">
+          <div className="rounded-xl bg-slate-100 transition-colors duration-1000 ease-out hover:bg-slate-200 focus:ring-2 focus:ring-[#5FA69A]/40 focus:outline-none disabled:opacity-50">
             <button
               type="button"
               onClick={() => {
@@ -38,7 +44,10 @@ const FocusCard = () => {
               </div>
             </button>
 
-            {isOpen && (
+            <div
+              id="focus-panel"
+              className={`overflow-hidden transition-all duration-500 ease-out ${isOpen ? 'max-h-[300px] opacity-100' : 'max-h-0 opacity-0'} `}
+            >
               <div className="rounded-b-xl border-t border-slate-200 bg-white px-4 py-4">
                 <textarea
                   value={draft}
@@ -68,7 +77,7 @@ const FocusCard = () => {
                   </div>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </Card>
       </div>
