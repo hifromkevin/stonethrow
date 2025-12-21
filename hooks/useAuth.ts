@@ -1,8 +1,10 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
-export function useAuth() {
+const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -38,4 +40,6 @@ export function useAuth() {
   const signOut = async () => await supabase.auth.signOut();
 
   return { user, loading, signIn, signUp, signOut };
-}
+};
+
+export default useAuth;
