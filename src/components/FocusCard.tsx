@@ -67,7 +67,7 @@ const FocusCard = () => {
                       }}
                     />
                     <Button
-                      label="Save"
+                      label="Set Focus"
                       clickFn={() => {
                         setFocusStmt(draft);
                         setIsOpen(false);

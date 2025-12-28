@@ -1,7 +1,7 @@
 'use client';
 
 import { redirect } from 'next/navigation';
-import useAuth from '@/hooks/useAuth';
+import useAuth from '@/lib/queries/useAuth';
 
 export default function Home() {
   const { user, loading } = useAuth();

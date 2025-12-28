@@ -1,7 +1,8 @@
 'use client';
 
 import { Search, Plus, Filter } from 'lucide-react';
-import useAuth from '../../hooks/useAuth';
+import useAuth from '../lib/queries/useAuth';
+import { useRouter } from 'next/navigation';
 import { HeaderProps } from '@/types/header';
 
 export default function Header({
@@ -10,6 +11,12 @@ export default function Header({
   onAddClick,
 }: HeaderProps) {
   const { signOut } = useAuth();
+  // const signOut = () => {
+  //   const router = useRouter();
+  //   console.log('Himom!');
+
+  //   router.replace('/login');
+  // };
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 mx-auto flex w-full items-center justify-center border-b border-gray-200 bg-white px-8 py-4">
@@ -35,10 +42,7 @@ export default function Header({
           <button
             onClick={onAddClick}
             className="btn-primary flex items-center space-x-2"
-          >
-            <Plus className="h-5 w-5" />
-            <span>Add Link</span>
-          </button>
+          ></button>
 
           <button onClick={() => signOut()} className="btn-secondary text-sm">
             Sign Out
