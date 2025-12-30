@@ -12,11 +12,10 @@ const FocusedPebbles = () => {
         <div
           className={`grid ${COLUMN_SPACING} gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500`}
         >
-          <span /> {/* star spacer */}
+          <span />
           <span className="tracking-[0.02em]">Pebble Name</span>
           <span>Why is this focused?</span>
-          <span /> {/* kebab spacer */}
-          {/* <span className="pr-4 text-right"> </span> */}
+          <span />
         </div>
         <div className="divide-y divide-slate-100">
           {/* Placeholder for focused pebbles */}

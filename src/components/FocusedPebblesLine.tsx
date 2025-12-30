@@ -25,15 +25,8 @@ const FocusedPebblesRow = ({
     if (action === 'delete') onDelete(pebble.id);
   };
 
-  // <div key={pebble.id} className="grid grid-cols-[auto_1fr_220px_auto] gap-4 px-3 py-3">
-  //             <span className="pl-2"> </span>
-  //             <span>{pebble.name}</span>
-  //             <span>{pebble.reason}</span>
-  //             {/* <span className="pr-4 text-right"> </span> */}
-  //           </div>
-
   return (
-    <div className="group relative odd:bg-white even:bg-slate-50/40">
+    <div className="group relative odd:bg-white even:bg-slate-50/40 hover:bg-slate-50/50">
       <div
         className="absolute top-0 left-0 h-full w-1.5"
         style={{ backgroundColor: pebble.group_color }}
@@ -44,26 +37,11 @@ const FocusedPebblesRow = ({
           className={`grid ${COLUMN_SPACING} items-center gap-2 border-b border-slate-100 px-3 py-2 last:border-0`}
         >
           <button
-            // onClick={async () => {
-            //   const newVal = !isStarSelected;
-            //   // optimistic UI
-            //   setIsStarSelected(newVal);
-
-            //   const { error } = await supabase
-            //     .from('focused_pebbles')
-            //     .update({ is_starred: newVal })
-            //     .eq('id', pebble.id);
-
-            //   if (error) {
-            //     // rollback on error
-            //     setIsStarSelected(!newVal);
-            //     console.error('Failed to update star', error);
-            //   } else {
-            //     onStarChange(pebble.id, newVal);
-            //   }
-            // }}
             aria-pressed={isStarSelected}
             className="text-slate-500 hover:text-amber-500"
+            onClick={() => {
+              setIsStarSelected((props) => !props);
+            }}
           >
             {isStarSelected ? '★' : '☆'}
           </button>

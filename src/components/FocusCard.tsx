@@ -15,7 +15,7 @@ const FocusCard = () => {
   const [focusStmt, setFocusStmt] = useState('');
 
   return (
-    <Card className="m-8 w-full max-w-5xl">
+    <Card className="m-10 w-full max-w-4xl">
       <div className="border-b border-slate-200 px-6 py-2">
         <p className="text-xs font-semibold tracking-[0.2em] text-slate-500">
           CURRENT FOCUS
@@ -23,7 +23,9 @@ const FocusCard = () => {
         <h1>What are you focused on right now?</h1>
 
         <Card className="mt-4">
-          <div className="rounded-xl bg-slate-100 transition-colors duration-1000 ease-out hover:bg-slate-200 focus:ring-2 focus:ring-[#5FA69A]/40 focus:outline-none disabled:opacity-50">
+          <div
+            className={`transition-all duration-500 ease-out ${handleFocusHeaderStyling(isOpen)}`}
+          >
             <button
               type="button"
               onClick={() => {
