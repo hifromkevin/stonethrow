@@ -20,7 +20,7 @@ export default function Header() {
     <header className="fixed inset-x-0 top-0 z-40 mx-auto flex w-full items-center justify-center border-b border-gray-200 bg-white px-8 py-2 shadow-sm">
       <div className="flex w-full max-w-5xl">
         <div className="flex flex-1 items-center space-x-6">
-          <h1 className="logo">stonethrow</h1>
+          <img src="/logo.svg" alt="stonethrow" className="h-8" />
 
           <div className="max-w-md flex-1">
             <div className="relative">
