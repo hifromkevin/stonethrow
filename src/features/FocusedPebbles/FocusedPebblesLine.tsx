@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Pebble } from '@/types';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabaseClient';
 
 const stripProtocol = (url: string) =>
   url.replace(/^[a-zA-Z]+:\/\//, '').replace(/^www\./, '');
