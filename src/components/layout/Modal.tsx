@@ -1,7 +1,7 @@
 import { ModalProps } from '@/types';
 import Button from '../ui/Button';
 
-const Modal = ({ isOpen, onClose }: ModalProps) => {
+const Modal = ({ isOpen, onClose, action }: ModalProps) => {
   if (!isOpen) return null;
 
   return (
@@ -26,7 +26,13 @@ const Modal = ({ isOpen, onClose }: ModalProps) => {
             variant="secondary"
             clickFn={() => onClose(false)}
           />
-          <Button label="Set Focus" clickFn={() => onClose(true)} />
+          <Button
+            label="Set Focus"
+            clickFn={() => {
+              onClose(true);
+              action();
+            }}
+          />
         </div>
       </div>
     </div>
