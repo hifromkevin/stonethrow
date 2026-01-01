@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Pebble } from '@/types';
-import { supabase } from '@/lib/supabaseClient';
 
 const stripProtocol = (url: string) =>
-  url.replace(/^[a-zA-Z]+:\/\//, '').replace(/^www\./, '');
+  url ? url.replace(/^[a-zA-Z]+:\/\//, '').replace(/^www\./, '') : null;
 
 const FocusedPebblesRow = ({
   pebble,
@@ -54,7 +53,7 @@ const FocusedPebblesRow = ({
               {pebble.title}
             </a>
             <p className="truncate text-xs leading-tight text-slate-500">
-              ({stripProtocol(pebble.url)})
+              ({stripProtocol(pebble.original_url)})
             </p>
           </div>
 

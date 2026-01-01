@@ -1,6 +1,6 @@
 export type ModalProps = {
   isOpen: boolean;
   onClose: Function;
-  action: Function;
+  onSuccess: Function;
   // children: React.ReactNode;
 };

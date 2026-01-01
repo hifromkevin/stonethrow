@@ -60,8 +60,8 @@ const OtherPebbles = () => {
     <div className="m-8 w-full max-w-5xl">
       <h2>Other Pebbles</h2>
       <div className="mt-3 divide-y divide-slate-100">
-        {otherPebbles.map((group) => (
-          <OtherPebblesGroup pebbleGroup={group} />
+        {otherPebbles.map((group, idx) => (
+          <OtherPebblesGroup pebbleGroup={group} key={`${group.id}-${idx}`} />
         ))}
       </div>
     </div>

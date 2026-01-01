@@ -2,7 +2,7 @@ import { prioritizedPebbles } from '@/lib/mockData';
 import FocusedPebblesRow from './FocusedPebblesLine';
 import { Focus } from 'lucide-react';
 
-const FocusedPebbles = () => {
+const FocusedPebbles = ({ savedPebbles }: { savedPebbles: any[] }) => {
   const COLUMN_SPACING = 'grid-cols-[32px_1fr_500px_40px]';
 
   return (
@@ -19,21 +19,19 @@ const FocusedPebbles = () => {
         </div>
         <div className="divide-y divide-slate-100">
           {/* Placeholder for focused pebbles */}
-          {prioritizedPebbles.map((pebble) => (
+          {/* {prioritizedPebbles.map((pebble) => (
             <FocusedPebblesRow
               key={pebble.id}
               pebble={pebble}
               COLUMN_SPACING={COLUMN_SPACING}
             />
-            // <div
-            //   key={pebble.id}
-            //   className="grid grid-cols-[auto_1fr_500px_auto] gap-4 px-3 py-3"
-            // >
-            //   <span className="pl-2"> </span>
-            //   <span>{pebble.name}</span>
-            //   <span>{pebble.reason}</span>
-            //   {/* <span className="pr-4 text-right"> </span> */}
-            // </div>
+          ))} */}
+          {savedPebbles.map((pebble) => (
+            <FocusedPebblesRow
+              key={pebble.id}
+              pebble={pebble}
+              COLUMN_SPACING={COLUMN_SPACING}
+            />
           ))}
         </div>
       </div>

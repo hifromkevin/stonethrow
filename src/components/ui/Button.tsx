@@ -2,6 +2,9 @@ interface ButtonProps {
   label: string;
   clickFn?: React.MouseEventHandler<HTMLButtonElement>;
   variant?: 'primary' | 'secondary';
+  type?: 'button' | 'submit' | 'reset';
+  overrides?: string;
+  disabled?: boolean;
 }
 
 const base =
@@ -14,9 +17,21 @@ const variants = {
     'text-slate-500 no-border transition-colors duration-1000 ease-out hover:text-slate-700',
 };
 
-const Button = ({ label, clickFn, variant = 'primary' }: ButtonProps) => {
+const Button = ({
+  label,
+  clickFn,
+  variant = 'primary',
+  type = 'button',
+  overrides,
+  disabled = false,
+}: ButtonProps) => {
   return (
-    <button onClick={clickFn} className={`${base} ${variants[variant]}`}>
+    <button
+      className={`${base} ${variants[variant]} ${overrides ?? ''}`}
+      onClick={clickFn}
+      type={type}
+      disabled={disabled}
+    >
       {label}
     </button>
   );

@@ -13,7 +13,7 @@ export default function Header() {
   //   const router = useRouter();
   //   console.log('Himom!');
 
-  //   router.replace('/login');
+  //   router.push('/login');
   // };
 
   return (
@@ -27,7 +27,7 @@ export default function Header() {
               <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 transform text-gray-400" />
               <input
                 type="text"
-                placeholder="Search links..."
+                placeholder="Search Pebbles..."
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 className="input-field pl-10 focus-visible:outline-none"
@@ -44,7 +44,7 @@ export default function Header() {
             <div className="h-6 w-6 rounded-full bg-slate-300"></div>
           </button>
 
-          <button onClick={() => signOut()} className="btn-secondary text-sm">
+          <button onClick={signOut} className="btn-secondary text-sm">
             Sign Out
           </button>
         </div>

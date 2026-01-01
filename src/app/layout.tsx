@@ -25,7 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html className={` ${afacad.variable} ${inter.variable}`} lang="en">
-      <body className={`pt-12 antialiased`}>{children}</body>
+      <body className={`antialiased`}>{children}</body>
     </html>
   );
 }

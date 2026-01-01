@@ -1,59 +1,116 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import useAuth from '@/lib/queries/useAuth';
+
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import CenteredComponent from '@/components/layout/CenteredComponent';
 import Link from 'next/link';
 
 export default function LoginPage() {
+  const { signIn, signUp } = useAuth();
+  const router = useRouter();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSignIn = async () => {
+    setLoading(true);
+    setError(null);
+
+    const { error } = await signIn(email, password);
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+      return;
+    }
+
+    router.push('/dashboard');
+  };
+
+  const handleSignUp = async () => {
+    setLoading(true);
+    setError(null);
+
+    const { error } = await signUp(email, password);
+
+    setLoading(false);
+
+    if (error) {
+      setError(error.message);
+      console.log('Sign-up error:', error);
+      return;
+    } else {
+      router.push('/dashboard');
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
-      <div className="card w-full max-w-md p-10 text-center">
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
-          Stonethrow
-        </h1>
-        <p className="mt-2 text-slate-500">Sign in to your account</p>
+    <div className="flex min-h-screen w-screen items-center justify-center bg-slate-100">
+      <CenteredComponent>
+        <Card className="m-10 w-full max-w-xl">
+          <div className="flex flex-col items-center border-b border-slate-200 px-6 py-6 text-center">
+            <img src="/logo.svg" alt="stonethrow" className="h-12" />
 
-        <form className="mt-8 space-y-4">
-          <div className="space-y-2 text-left">
-            <label className="block text-sm font-medium text-slate-700">
-              Email
-            </label>
-            <input
-              type="email"
-              defaultValue="you@example.com"
-              className="focus:border-brand focus:ring-brand/20 w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 transition focus:ring-2"
-            />
+            <form className="mt-8 w-full space-y-4">
+              <div className="space-y-2 text-left">
+                <label className="block text-sm font-medium text-slate-700">
+                  Email
+                </label>
+
+                <input
+                  type="email"
+                  placeholder="Email"
+                  className="mb-3 w-full rounded border px-3 py-2"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2 text-left">
+                <label className="block text-sm font-medium text-slate-700">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  placeholder="Password"
+                  className="mb-4 w-full rounded border px-3 py-2"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+              {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
+
+              <Button
+                label="Sign in"
+                type="submit"
+                overrides="w-full"
+                clickFn={handleSignIn}
+                disabled={loading}
+              />
+            </form>
+
+            <p className="mt-4 text-sm text-slate-500">
+              For MVP, any credentials will work
+            </p>
+            <div className="mt-6">
+              <Link
+                onClick={handleSignUp}
+                href="#"
+                className="flex-1 rounded border px-4 py-2"
+              >
+                Sign Up
+              </Link>
+            </div>
           </div>
-
-          <div className="space-y-2 text-left">
-            <label className="block text-sm font-medium text-slate-700">
-              Password
-            </label>
-            <input
-              type="password"
-              defaultValue="password"
-              className="focus:border-brand focus:ring-brand/20 w-full rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-slate-900 transition focus:ring-2"
-            />
-          </div>
-
-          <button
-            type="submit"
-            className="bg-brand hover:bg-brand/90 w-full rounded-lg py-3 font-semibold text-white shadow-sm transition"
-          >
-            Sign in
-          </button>
-        </form>
-
-        <p className="mt-4 text-sm text-slate-500">
-          For MVP, any credentials will work
-        </p>
-        <div className="mt-6">
-          <Link
-            href="/dashboard"
-            className="text-brand text-sm hover:underline"
-          >
-            Skip to dashboard →
-          </Link>
-        </div>
-      </div>
+        </Card>
+      </CenteredComponent>
     </div>
   );
 }

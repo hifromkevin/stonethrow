@@ -29,7 +29,7 @@ const OtherPebblesGroup = ({
 
           <span className="text-sm text-slate-500">
             ({pebbleGroup.items.length}{' '}
-            {pebbleGroup.items.length === 1 ? 'link' : 'links'})
+            {pebbleGroup.items.length === 1 ? 'pebble' : 'pebbles'})
           </span>
         </div>
 
@@ -41,8 +41,8 @@ const OtherPebblesGroup = ({
       <div
         className={`border-t border-slate-100 transition-all duration-700 ease-out ${open ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'} `}
       >
-        {pebbleGroup.items.map((item) => (
-          <OtherPebblesItemRow key={item.id} pebble={item} />
+        {pebbleGroup.items.map((item, idx) => (
+          <OtherPebblesItemRow key={`${item.id}-${idx}`} pebble={item} />
         ))}
       </div>
     </div>
