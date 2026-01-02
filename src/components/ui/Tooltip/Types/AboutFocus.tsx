@@ -1,4 +1,4 @@
-const FocusDescription = () => (
+const AboutFocus = () => (
   <div className="space-y-2 leading-snug text-pretty text-slate-700">
     <p className="text-xs font-medium tracking-[0.05em] tracking-wide text-slate-500 uppercase">
       About focus
@@ -14,4 +14,4 @@ const FocusDescription = () => (
   </div>
 );
 
-export default FocusDescription;
+export default AboutFocus;

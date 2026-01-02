@@ -8,7 +8,7 @@ const FocusedPebbles = ({ savedPebbles }: { savedPebbles: any[] }) => {
   return (
     <div className="mx-8 w-full max-w-5xl">
       <h2>These are the Pebbles most worth your attention right now</h2>
-      <div className="mt-3 overflow-hidden rounded-t-xl border border-slate-200 bg-white">
+      <div className="mt-3 rounded-t-xl border border-slate-200 bg-white">
         <div
           className={`grid ${COLUMN_SPACING} gap-2 border-b border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500`}
         >

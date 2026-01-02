@@ -41,7 +41,7 @@ const TooltipArrow = ({
 
   return (
     <span
-      className={`absolute h-2 w-2 rotate-45 border-b-1 border-l-1 border-slate-300 bg-white ${sideClasses[side]} ${alignClasses[side]} `}
+      className={`absolute h-2 w-2 rotate-45 bg-white ${sideClasses[side]} ${alignClasses[side]} `}
     />
   );
 };

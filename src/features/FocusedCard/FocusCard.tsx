@@ -23,17 +23,12 @@ const FocusCard = () => {
         </p>
         <h1>
           What are you focused on right now?{' '}
-          <Tooltip side="right">
+          <Tooltip side="right" type="focus-card">
             <span className="ml-1 inline-block text-slate-500 hover:text-slate-700">
               ⓘ
             </span>
           </Tooltip>
         </h1>
-        {/* TODO: Tooltip: Your focus statement helps prioritize your saved Pebbles. 
-        Your focus can be vague or specific. Either approach works. (or Your focus can be vague or specific. There’s no wrong choice.)
-        <em>For example: "Get back into a regular fitness routine."</em> // Also indent and lighten the example text
-
-        Stonethrow uses your focus to help surface what matters most. */}
         <Card className="mt-4">
           <div
             className={`transition-all duration-500 ease-out ${handleFocusHeaderStyling(isOpen)}`}

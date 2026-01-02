@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Tooltip from '@/components/ui/Tooltip/Tooltip';
 import { Pebble } from '@/types';
 import decodeHtmlEntities from '@/lib/urls/decodeHtmlTitles';
 
@@ -60,9 +61,13 @@ const FocusedPebblesRow = ({
           </div>
 
           <div className="text-sm leading-snug text-slate-500">
-            ⓘ{' '}
-            {pebble.notes ||
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam blandit felis ut velit aliquet, id tincidunt risus tempus.'}
+            <Tooltip
+              side="top"
+              type="basic"
+              content="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam blandit felis ut velit aliquet, id tincidunt risus tempus."
+            >
+              ⓘ
+            </Tooltip>
           </div>
 
           <div className="relative">

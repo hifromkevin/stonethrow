@@ -8,3 +8,4 @@ export type { ApiError, RequestOptions } from '@/types/api';
 export type { Category, Link } from '@/types/supabase';
 export type { Pebble, OtherPebbleGroup } from '@/types/pebble';
 export type { ModalProps } from '@/types/modal';
+export type { TooltipProps } from '@/types/tooltip';
