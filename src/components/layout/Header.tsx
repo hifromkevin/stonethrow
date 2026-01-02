@@ -44,7 +44,10 @@ export default function Header() {
             <div className="h-6 w-6 rounded-full bg-slate-300"></div>
           </button>
 
-          <button onClick={signOut} className="btn-secondary text-sm">
+          <button
+            onClick={signOut}
+            className="btn-secondary cursor-pointer text-sm"
+          >
             Sign Out
           </button>
         </div>
