@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button';
 import addPebble from '@/app/actions/addPebble';
 import { getAddPebbleErrorMessage } from '@/lib/errors/getAddPebbleErrorMessage';
 
-const Modal = ({ isOpen, onClose, onSuccess }: ModalProps) => {
+const Modal = ({ isOpen, onClose }: ModalProps) => {
   if (!isOpen) return null;
 
   const [pebbleError, setPebbleError] = useState<string | null>(null);

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
 const handleFocusHeaderStyling = (isOpen: boolean) => {
   return isOpen
@@ -17,11 +18,22 @@ const FocusCard = () => {
   return (
     <Card className="m-10 w-full max-w-4xl">
       <div className="border-b border-slate-200 px-6 py-2">
-        <p className="text-xs font-semibold tracking-[0.2em] text-slate-500">
+        <p className="text-xs font-semibold tracking-[0.05em] text-slate-500">
           CURRENT FOCUS
         </p>
-        <h1>What are you focused on right now?</h1>
+        <h1>
+          What are you focused on right now?{' '}
+          <Tooltip side="right">
+            <span className="ml-1 inline-block text-slate-500 hover:text-slate-700">
+              ⓘ
+            </span>
+          </Tooltip>
+        </h1>
+        {/* TODO: Tooltip: Your focus statement helps prioritize your saved Pebbles. 
+        Your focus can be vague or specific. Either approach works. (or Your focus can be vague or specific. There’s no wrong choice.)
+        <em>For example: "Get back into a regular fitness routine."</em> // Also indent and lighten the example text
 
+        Stonethrow uses your focus to help surface what matters most. */}
         <Card className="mt-4">
           <div
             className={`transition-all duration-500 ease-out ${handleFocusHeaderStyling(isOpen)}`}
@@ -56,7 +68,7 @@ const FocusCard = () => {
                   onChange={(e) => setDraft(e.target.value)}
                   rows={3}
                   className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition"
-                  placeholder="Describe your current focus. Shorter is better (roughly a sentence or two), but there's no wrong answer."
+                  placeholder="Add your current focus..."
                 />
                 {/* TODO: If AI can't help (EX: bombastic question, or doesn't match 
                 the scope of the selected Pebbles),

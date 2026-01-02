@@ -1,5 +1,5 @@
 import { prioritizedPebbles } from '@/lib/mockData';
-import FocusedPebblesRow from './FocusedPebblesLine';
+import FocusedPebblesRow from './FocusedPebblesRow';
 import { Focus } from 'lucide-react';
 
 const FocusedPebbles = ({ savedPebbles }: { savedPebbles: any[] }) => {
@@ -14,7 +14,7 @@ const FocusedPebbles = ({ savedPebbles }: { savedPebbles: any[] }) => {
         >
           <span />
           <span className="tracking-[0.02em]">Pebble Name</span>
-          <span>Why is this focused?</span>
+          <span>Why?</span>
           <span />
         </div>
         <div className="divide-y divide-slate-100">

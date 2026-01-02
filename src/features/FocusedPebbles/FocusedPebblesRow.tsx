@@ -60,6 +60,7 @@ const FocusedPebblesRow = ({
           </div>
 
           <div className="text-sm leading-snug text-slate-500">
+            ⓘ{' '}
             {pebble.notes ||
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam blandit felis ut velit aliquet, id tincidunt risus tempus.'}
           </div>
