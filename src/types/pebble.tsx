@@ -17,15 +17,32 @@ export type Pebble = {
   is_archived: boolean;
   created_at: string;
 
-  // source_type: 'video' | 'article' | 'image' | 'repo' | 'other';
+  // TODO: Determine ALL fields required to make Pebbles useful
+
+  //   user_signals {
+  //   starred
+  //   completed
+  //   skipped_count
+  //   open_count
+  //   last_opened_at
+  // }
+
+  // source_type: 'video' | 'article' | 'image' | 'repo' | 'interactive/class' | 'audio' | 'other';
   // focus_state: 'focused' | 'unfocused';
   // topics: Topic[];
 
-  // estimated_time      // 5–10 min | 30 min | 2 hrs
+  // estimated_time:
+  // | 'quick'        // ≤10 min
+  // | 'short'        // 10–30 min
+  // | 'session'      // 30–90 min
+  // | 'deep'         // 1.5–3 hrs
+  // | 'project'      // 3+ hrs
+
   // difficulty          // beginner | intermediate | advanced
-  // intent_tags         // tutorial | reference | inspiration
+  // intent_tags         // tutorial | reference | inspiration | overview | opinion [] // ex: [tutorial, reference]
   // topic_embeddings    // vector
-  // freshness_score
+  // freshness_score     // How risky is the content of being outdated. EX: Guitar: Decays slowly. React? Decays FAST. API Docs: Hard decay. Philosophy: Barely decays.
+  // freshness_score = base_score * topic_decay_factor
   // user_signals        // starred, completed, skipped
   // content_access = 'full' | 'partial' | 'none'
 };

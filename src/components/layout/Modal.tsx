@@ -4,12 +4,11 @@ import { ModalProps } from '@/types';
 import Button from '@/components/ui/Button';
 import addPebble from '@/app/actions/addPebble';
 import { getAddPebbleErrorMessage } from '@/lib/errors/getAddPebbleErrorMessage';
-import { AddPebbleError } from '@/types';
 
 const Modal = ({ isOpen, onClose, onSuccess }: ModalProps) => {
   if (!isOpen) return null;
 
-  const [pebbleError, setPebbleError] = useState<AddPebbleError | null>(null);
+  const [pebbleError, setPebbleError] = useState<string | null>(null);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -24,25 +23,18 @@ const Modal = ({ isOpen, onClose, onSuccess }: ModalProps) => {
         <form
           action={async (formData: FormData) => {
             const url = formData.get('url') as string;
-
             const result = await addPebble(url);
 
-            console.log('himom!', result);
+            // TODO: Loading state while waiting for response
 
             if (!result.ok) {
               setPebbleError(getAddPebbleErrorMessage(result?.error));
-              return;
+            } else {
+              // TODO: Some sort of success indication send a Toast congratulating user
             }
 
-            const pebble = result.data;
-
-            onSuccess({
-              id: pebble?.id,
-              title: pebble?.title ?? 'Untitled',
-              url: pebble?.canonical_url ?? pebble?.original_url,
-            });
-
             onClose(false);
+            return;
           }}
         >
           <input

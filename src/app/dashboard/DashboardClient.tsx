@@ -24,21 +24,10 @@ export default function Dashboard({
   savedPebbles: Pebble[];
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [items, setItems] = useState<Preview[]>([]);
-
   const [loading, setLoading] = useState(false);
-
-  const router = useRouter();
-
-  console.log('Initial Pebbles:', savedPebbles);
-
-  const handleNewPebble = (preview: Preview) => {
-    setItems((prev) => [preview, ...prev]);
-  };
 
   return (
     <>
-      {console.log('Items:', items)}
       <div className="min-h-screen w-screen bg-slate-100 pt-12">
         <Header />
         <CenteredComponent>
@@ -64,7 +53,6 @@ export default function Dashboard({
           // shouldSaveAndClose ? router.refresh() : null;
           setIsModalOpen(false);
         }}
-        onSuccess={handleNewPebble}
       ></Modal>
     </>
   );

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Pebble } from '@/types';
+import decodeHtmlEntities from '@/lib/urls/decodeHtmlTitles';
 
 const stripProtocol = (url: string) =>
   url ? url.replace(/^[a-zA-Z]+:\/\//, '').replace(/^www\./, '') : null;
@@ -15,6 +16,7 @@ const FocusedPebblesRow = ({
   const [isStarSelected, setIsStarSelected] = useState(pebble.is_starred);
   const onComplete = (id: string) => console.log('complete', id);
   const onDelete = (id: string) => console.log('delete', id);
+  //TODO: handle data changes here
   const onStarChange = (id: string, isStarred: boolean) =>
     console.log('star change', id, isStarred);
 
@@ -50,7 +52,7 @@ const FocusedPebblesRow = ({
               // href={pebble.url}
               className="hover:text-brand block truncate text-sm leading-tight font-medium text-slate-900"
             >
-              {pebble.title}
+              {decodeHtmlEntities(pebble.title)}
             </a>
             <p className="truncate text-xs leading-tight text-slate-500">
               ({stripProtocol(pebble.original_url)})
@@ -58,7 +60,8 @@ const FocusedPebblesRow = ({
           </div>
 
           <div className="text-sm leading-snug text-slate-500">
-            {pebble.notes || 'This is foundational in learning how to ...'}
+            {pebble.notes ||
+              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam blandit felis ut velit aliquet, id tincidunt risus tempus.'}
           </div>
 
           <div className="relative">

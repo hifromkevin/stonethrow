@@ -1,13 +1,9 @@
-import { AddPebbleError } from '@/types/errors';
+import { AddPebbleError } from '@/types';
+import { Pebble } from '@/types';
 
 export type AddPebbleSuccess = {
   ok: true;
-  data: {
-    id: string;
-    title: string | null;
-    canonical_url: string;
-    original_url: string;
-  };
+  data: Pebble[];
 };
 
 export type AddPebbleFailure = {

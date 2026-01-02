@@ -58,6 +58,14 @@ const FocusCard = () => {
                   className="mt-2 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 transition"
                   placeholder="Describe your current focus. Shorter is better (roughly a sentence or two), but there's no wrong answer."
                 />
+                {/* TODO: If AI can't help (EX: bombastic question, or doesn't match 
+                the scope of the selected Pebbles),
+                gives a gentle "ⓘ This focus doesn’t match your saved Pebbles."
+                OR: "You don't have any ___ pebbles saved yet."
+                Followed by: If you want help prioritizing learning material, 
+                add a few relevant links first."
+                Maybe a small icon with tooltip: 
+                ⓘ Why no results? */}
                 <div className="mt-3 flex justify-end">
                   <div className="flex gap-2">
                     <Button
