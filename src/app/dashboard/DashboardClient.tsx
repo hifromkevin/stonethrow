@@ -29,7 +29,7 @@ const DashboardClient = () => {
 
   return (
     <>
-      <div className="min-h-screen w-screen bg-slate-100 pt-12">
+      <div className="min-h-screen w-screen bg-white pt-12">
         <Header />
         <CenteredComponent>
           <FocusCard />
