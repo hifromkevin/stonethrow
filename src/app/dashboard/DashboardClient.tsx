@@ -41,7 +41,7 @@ const DashboardClient = () => {
         <CenteredComponent>
           <OtherPebbles />
         </CenteredComponent>
-        <div className="fixed right-8 bottom-8 z-50 text-sm text-slate-500">
+        <div className="fixed right-6 bottom-6 xl:right-[calc(40%-40rem/2)]">
           <AddPebbleIcon handleClick={() => setIsModalOpen(true)} />
         </div>
       </div>
