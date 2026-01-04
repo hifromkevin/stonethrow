@@ -17,10 +17,7 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const { url } = await req.json();
-    console.log('📥 POST /api/pebbles url:', url);
-
     const result = await addPebble(url);
-    console.log('📤 addPebble result:', result);
 
     return NextResponse.json(result);
   } catch (err) {
