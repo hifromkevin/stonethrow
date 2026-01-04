@@ -19,14 +19,18 @@ const Tooltip = ({
   };
 
   return (
-    <span className="group relative inline-flex">
+    <span className="group/tooltip relative inline-flex cursor-help items-center">
       {children}
 
       <div
         role="tooltip"
-        className={`pointer-events-none absolute z-[100] ml-3 w-[22rem] rounded-xl bg-slate-50 px-5 py-4 text-base leading-6 text-pretty text-slate-900 opacity-0 shadow-lg transition group-hover:translate-y-0 group-hover:scale-100 group-hover:opacity-100 ${positionClasses[side]}`}
+        className={`pointer-events-none absolute z-[100] w-[22rem] rounded-xl bg-slate-50 px-5 py-4 text-base leading-6 text-pretty text-slate-900 opacity-0 shadow-lg transition group-hover/tooltip:scale-100 group-hover/tooltip:opacity-100 ${positionClasses[side]} `}
       >
-        {type === 'focus-card' ? <AboutFocus /> : <FocusReason />}
+        {type === 'focus-card' ? (
+          <AboutFocus />
+        ) : (
+          <FocusReason reason={content} />
+        )}
         <TooltipArrow side={side} />
       </div>
     </span>

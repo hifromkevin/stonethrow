@@ -3,6 +3,7 @@ export interface Link {
   user_id: string;
   original_url: string; // what user pasted
   canonical_url: string | null; // stripped down version of url
+  domain: string | null;
   title: string | null;
   description: string | null;
   site_name: string | null;

@@ -44,7 +44,7 @@ export default function LoginPage() {
 
     if (error) {
       setError(error.message);
-      console.log('Sign-up error:', error);
+      console.error('Sign-up error:', error);
       return;
     } else {
       router.push('/dashboard');

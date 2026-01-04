@@ -1,9 +1,5 @@
-import { getPebbles } from '@/lib/queries/getPebbles';
 import DashboardClient from './DashboardClient';
 
-export default async function DashboardPage() {
-  const pebbles = await getPebbles();
-  // const focus = await getFocusStatement();
+const Dashboard = () => <DashboardClient />;
 
-  return <DashboardClient savedPebbles={pebbles} />;
-}
+export default Dashboard;

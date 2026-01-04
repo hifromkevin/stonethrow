@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import createClient from '@/lib/supabase/server';
 
 const requireUser = async () => {
   const supabase = await createClient();
@@ -8,13 +8,10 @@ const requireUser = async () => {
     error,
   } = await supabase.auth.getUser();
 
-  if (error) {
-    console.error('❌ auth.getUser error:', error);
-    return null;
-  }
+  if (!user) console.error('⚠️ No authenticated user found in requireUser');
 
-  if (!user) {
-    console.warn('⚠️ No authenticated user');
+  if (error || !user) {
+    console.warn('⚠️ Error fetching user in requireUser:', error);
     return null;
   }
 

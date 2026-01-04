@@ -10,6 +10,7 @@ export type Pebble = {
   title: string;
   canonical_url: string;
   original_url: string;
+  domain: string;
   notes?: string;
   group_name: string;
   group_color: string;

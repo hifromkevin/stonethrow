@@ -16,6 +16,6 @@ export function getAddPebbleErrorMessage(error: AddPebbleError): string {
 
     case 'DB_ERROR':
     default:
-      return 'We couldn’t save this link right now. Please try again.';
+      return 'We couldn’t save your Pebble. Please try again.';
   }
 }

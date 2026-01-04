@@ -41,23 +41,29 @@ const FocusedPebblesRow = ({
           <button
             aria-pressed={isStarSelected}
             className="text-slate-500 hover:text-amber-500"
-            onClick={() => {
-              setIsStarSelected((props) => !props);
-            }}
+            onClick={() => setIsStarSelected((props) => !props)}
           >
             {isStarSelected ? '★' : '☆'}
           </button>
 
           <div className="min-w-0">
             <a
-              // href={pebble.url}
-              className="hover:text-brand block truncate text-sm leading-tight font-medium text-slate-900"
+              className="truncate text-xs leading-tight text-slate-500"
+              href={pebble.original_url}
+              target="_blank"
+              rel="noreferrer"
             >
-              {decodeHtmlEntities(pebble.title)}
+              <p className="hover:text-brand block truncate text-sm leading-tight font-medium text-slate-900">
+                {decodeHtmlEntities(pebble.title)}
+              </p>
+              <p className="truncate text-xs leading-tight text-slate-500">
+                (
+                {pebble.domain ||
+                  stripProtocol(pebble.canonical_url) ||
+                  'unknown'}
+                )
+              </p>
             </a>
-            <p className="truncate text-xs leading-tight text-slate-500">
-              ({stripProtocol(pebble.original_url)})
-            </p>
           </div>
 
           <div className="text-sm leading-snug text-slate-500">

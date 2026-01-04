@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { Afacad, Inter } from 'next/font/google';
 
+import Providers from './providers';
+
 import './globals.css';
 
 const afacad = Afacad({
@@ -25,7 +27,9 @@ export default function RootLayout({
 }>) {
   return (
     <html className={` ${afacad.variable} ${inter.variable}`} lang="en">
-      <body className={`antialiased`}>{children}</body>
+      <body className={`antialiased`}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
