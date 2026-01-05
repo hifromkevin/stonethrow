@@ -1,17 +1,7 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import addPebble from '@/app/actions/addPebble';
 import { AddPebbleFailure, AddPebbleSuccess } from '@/types/addPebble';
-
-// const useAddPebble = () => {
-//   const queryClient = useQueryClient();
-
-//   return useMutation({
-//     mutationFn: addPebble,
-//     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['pebbles'] }),
-//   });
-// };
 
 const postPebble = async (url: string) => {
   const res = await fetch('/api/pebbles', {
@@ -20,9 +10,7 @@ const postPebble = async (url: string) => {
     body: JSON.stringify({ url }),
   });
 
-  if (!res.ok) {
-    throw new Error('Network error');
-  }
+  if (!res.ok) throw new Error('Network error');
 
   return res.json() as Promise<AddPebbleSuccess | AddPebbleFailure>;
 };
