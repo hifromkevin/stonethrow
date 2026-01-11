@@ -31,13 +31,13 @@ const FocusedPebble = () => {
         {/* Title row */}
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="truncate text-base font-semibold text-slate-900">
+            <h3 className="truncate text-base font-semibold text-slate-600">
               Bigger Text for Title w/ Ellipses if Too Long Goes Right Here
             </h3>
 
-            <p className="mt-0.5 truncate text-sm text-slate-500">url.com</p>
+            <p className="mt-0.5 truncate text-sm text-slate-400">url.com</p>
             <div className="mt-2 flex flex-wrap gap-2">
-              <div className="flex flex-wrap items-start gap-2 text-xs text-slate-500">
+              <div className="flex flex-wrap items-start gap-2 text-xs text-slate-600">
                 <span>High ROI</span>
                 <span className="text-slate-300">•</span>
                 <span>Aligns with focus</span>

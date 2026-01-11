@@ -3,7 +3,8 @@ import { useState } from 'react';
 import usePebbles from '@/lib/queries/client/usePebbles';
 
 import Header from '@/components/layout/Header';
-import FocusCard from '@/features/FocusedCard/FocusCard';
+import FocusCard from '@/features/FocusCard/FocusCard';
+
 import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
 import OtherPebbles from '@/features/OtherPebbles/OtherPebbles';
 import AddPebbleIcon from '@/features/AddPebbleIcon/AddPebbleIcon';

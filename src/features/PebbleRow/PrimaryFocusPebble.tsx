@@ -9,7 +9,7 @@ const stripProtocol = (url: string) =>
 const PrimaryFocusPebble = () => {
   return (
     <Card className="mt-3 mb-12 w-full max-w-6xl">
-      <div className="group grid grid-cols-[12px_80px_1fr_auto] items-center gap-4 rounded-xl border border-3 border-slate-300 bg-white px-5 py-6 hover:bg-slate-50">
+      <div className="group grid grid-cols-[12px_80px_1fr_auto] items-center gap-4 rounded-md border border-3 border-slate-300 bg-white px-5 py-6 hover:bg-slate-50">
         {/* ☆ Star */}
         <div className="flex pt-1">
           <button

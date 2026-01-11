@@ -44,7 +44,7 @@ const Modal = ({ isOpen, onClose }: ModalProps) => {
         onClick={() => onClose(false)}
       />
 
-      <div className="relative z-10 w-full max-w-md rounded-xl bg-white p-6 shadow-xl">
+      <div className="relative z-10 w-full max-w-md rounded-md bg-white p-6 shadow-xl">
         <h2>Add a Pebble</h2>
 
         <form onSubmit={handleSubmit}>
@@ -53,7 +53,7 @@ const Modal = ({ isOpen, onClose }: ModalProps) => {
             type="url"
             required
             placeholder="Paste a link to an article or video here"
-            className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-[#5FA69A] focus:ring-2 focus:ring-[#5FA69A]/30 focus:outline-none"
+            className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:outline-none"
             disabled={isPending}
           />
 

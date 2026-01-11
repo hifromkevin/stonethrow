@@ -3,14 +3,18 @@ import FocusedPebblesRow from './FocusedPebblesRow';
 import FocusedPebble from '@/features/PebbleRow/FocusedPebble';
 import { Focus } from 'lucide-react';
 import PrimaryFocusPebble from '@/features/PebbleRow/PrimaryFocusPebble';
+import LocalHeading from '@/components/layout/LocalHeading';
 
 const FocusedPebbles = ({ savedPebbles }: { savedPebbles: any[] }) => {
   const COLUMN_SPACING = 'grid-cols-[32px_1fr_30px_40px]';
 
   return (
     <div className="mx-8 w-full max-w-5xl">
-      <h2>If you only do one thing today, start here</h2>
+      <LocalHeading label="MAIN FOCUS" />
+
       <PrimaryFocusPebble />
+
+      <LocalHeading label="Other Pebbles" />
 
       <div className="mt-3 rounded-t-xl border border-slate-200 bg-white">
         <div
