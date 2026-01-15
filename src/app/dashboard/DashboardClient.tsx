@@ -2,24 +2,24 @@
 import { useState } from 'react';
 import usePebbles from '@/lib/queries/client/usePebbles';
 
+import CenteredComponent from '@/components/layout/CenteredComponent';
 import Header from '@/components/layout/Header';
+import Modal from '@/components/layout/Modal';
+
+import AddPebbleIcon from '@/features/AddPebbleIcon/AddPebbleIcon';
 import FocusCard from '@/features/FocusCard/FocusCard';
 
 import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
 import OtherPebbles from '@/features/OtherPebbles/OtherPebbles';
-import AddPebbleIcon from '@/features/AddPebbleIcon/AddPebbleIcon';
-import Modal from '@/components/layout/Modal';
-import CenteredComponent from '@/components/layout/CenteredComponent';
+import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
+import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
-import { Pebble } from '@/types';
-
-type Preview = {
-  title: string;
-  url: string;
-};
+import { FocusState } from '@/types';
 
 const DashboardClient = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [focusStatus, setFocusStatus] = useState<FocusState>('empty');
+
   const {
     data: pebbles = [],
     isLoading: pebblesLoading,
@@ -28,20 +28,44 @@ const DashboardClient = () => {
   if (pebblesLoading) return <div>Loading…</div>;
   if (pebblesError) return <div>Failed to load pebbles</div>;
 
+  const hasPebbles = pebbles.length > 0;
+
   return (
     <>
       <div className="min-h-screen w-screen bg-white pt-12">
         <Header />
         <CenteredComponent>
-          <FocusCard />
+          <FocusCard
+            focusStatus={focusStatus}
+            setFocusStatus={setFocusStatus}
+          />
         </CenteredComponent>
-        <CenteredComponent>
-          {/* TODO: These will eventually be only focused/starred pebbles  */}
-          <FocusedPebbles savedPebbles={pebbles} />
-        </CenteredComponent>
-        <CenteredComponent>
-          <OtherPebbles />
-        </CenteredComponent>
+
+        {!hasPebbles && (
+          <CenteredComponent>
+            <PebblesEmptyState
+              hasFocus={focusStatus === 'empty'}
+              onAddPebble={() => setIsModalOpen(true)}
+            />
+          </CenteredComponent>
+        )}
+
+        {hasPebbles && (
+          <>
+            <CenteredComponent>
+              <PrimaryFocusPebble primaryFocusPebble={pebbles[3]} />
+            </CenteredComponent>
+
+            <CenteredComponent>
+              <FocusedPebbles savedPebbles={pebbles.slice(1)} />
+            </CenteredComponent>
+
+            <CenteredComponent>
+              <OtherPebbles />
+            </CenteredComponent>
+          </>
+        )}
+
         <div className="fixed right-6 bottom-6 xl:right-[calc(40%-40rem/2)]">
           <AddPebbleIcon handleClick={() => setIsModalOpen(true)} />
         </div>
