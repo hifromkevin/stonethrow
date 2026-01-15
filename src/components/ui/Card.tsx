@@ -7,9 +7,7 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ children, className = '' }) => (
-  <section
-    className={`rounded-md bg-white shadow-xl ring-slate-200 ${className}`}
-  >
+  <section className={`rounded-md bg-white ring-slate-200 ${className}`}>
     {children}
   </section>
 );
