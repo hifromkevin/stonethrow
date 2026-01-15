@@ -74,13 +74,6 @@ const FocusCard = ({
                       : 'translate-y-4 opacity-0'
                   } `}
                 >
-                  {/* <textarea
-                    autoFocus
-                    value={focusText}
-                    onChange={(e) => setFocusText(e.target.value)}
-                    placeholder="Write your focus here…"
-                    className="w-full resize-none bg-white px-3 text-3xl focus:border-slate-400 focus:outline-none"
-                  /> */}
                   <TextArea
                     content={focusText}
                     setContent={setFocusText}
@@ -101,7 +94,7 @@ const FocusCard = ({
                     <Button
                       label="Save focus"
                       type="button"
-                      overrides="w-40"
+                      overrides="w-28"
                       clickFn={() => {
                         if (!focusText.trim()) return;
                         setFocusStatus('committed');
