@@ -30,6 +30,7 @@ const TextArea = ({ content, setContent, placeholderText = '' }: TTextArea) => {
   return (
     <textarea
       ref={textareaRef}
+      rows={1}
       autoFocus
       value={content}
       onChange={(e) => {
