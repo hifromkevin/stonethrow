@@ -3,6 +3,8 @@ import Tooltip from '@/components/ui/Tooltip/Tooltip';
 import { Pebble } from '@/types';
 import decodeHtmlEntities from '@/lib/urls/decodeHtmlTitles';
 import { CircleQuestionMark } from 'lucide-react';
+import EllipsisIcon from '@/components/ui/Ellipsis';
+import StarIcon from '@/components/ui/StarIcon';
 
 const stripProtocol = (url: string) =>
   url ? url.replace(/^[a-zA-Z]+:\/\//, '').replace(/^www\./, '') : null;
@@ -32,13 +34,10 @@ const FocusedPebbleRow = ({
     <div className="group grid grid-cols-[12px_50px_1fr_auto] items-center gap-4 border border-slate-200 bg-white px-2 py-2 hover:bg-slate-50">
       {/* ☆ Star */}
       <div className="flex pt-1">
-        <button
-          aria-pressed={isStarSelected}
-          className="text-slate-500 hover:text-amber-500"
-          onClick={() => setIsStarSelected((props) => !props)}
-        >
-          {isStarSelected ? '★' : '☆'}
-        </button>
+        <StarIcon
+          isStarSelected={isStarSelected}
+          setIsStarSelected={setIsStarSelected}
+        />
       </div>
 
       {/* Image */}
@@ -73,20 +72,15 @@ const FocusedPebbleRow = ({
             </div>
           </div>
 
-          {/* Why this matters */}
-
-          <CircleQuestionMark className="text-xs text-slate-500 hover:bg-slate-100" />
+          <Tooltip content="This is where the AI response will appear">
+            <CircleQuestionMark className="text-xs text-slate-500 hover:bg-slate-100" />
+          </Tooltip>
         </div>
       </div>
 
       {/* Ellipsis menu */}
       <div className="flex pt-1">
-        <button
-          className="rounded-md p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-          aria-label="More options"
-        >
-          …
-        </button>
+        <EllipsisIcon />
       </div>
     </div>
   );
