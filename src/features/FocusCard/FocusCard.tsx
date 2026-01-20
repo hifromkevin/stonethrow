@@ -22,7 +22,7 @@ const FocusCard = ({
   const isEmpty = focusStatus === 'empty';
 
   return (
-    <div className="m-8 w-full max-w-xl">
+    <div className="m-8 w-full max-w-4xl">
       <LocalHeading label="Current Focus" />
       {isEmpty && (
         <span className="w-2bg-red-400 ml-3 inline-block h-2 align-middle" />
@@ -91,7 +91,7 @@ const FocusCard = ({
                       Cancel
                     </button>
                     <Button
-                      label="Save focus"
+                      label="Save Focus"
                       type="button"
                       overrides="w-28"
                       clickFn={() => {

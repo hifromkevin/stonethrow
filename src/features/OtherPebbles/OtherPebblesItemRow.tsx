@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { Pebble } from '@/types';
+import StarIcon from '@/components/ui/StarIcon';
+import cleanTitle from '@/lib/urls/cleanTitle';
 
 const OtherPebblesItemRow = ({ pebble }: { pebble: Pebble }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,18 +11,15 @@ const OtherPebblesItemRow = ({ pebble }: { pebble: Pebble }) => {
     <div className="relative pl-10 odd:bg-white even:bg-slate-50/40 hover:bg-slate-50/50">
       <div className="grid grid-cols-[auto_1fr_220px_auto] items-center gap-3 px-4 py-2">
         {/* STAR */}
-        <button
-          aria-pressed={isStarSelected}
-          onClick={() => setIsStarSelected((v) => !v)}
-          className="text-slate-400 hover:text-amber-500"
-        >
-          {isStarSelected ? '★' : '☆'}
-        </button>
+        <StarIcon
+          isStarSelected={isStarSelected}
+          setIsStarSelected={setIsStarSelected}
+        />
 
         {/* TITLE */}
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-slate-900">
-            {pebble.title}
+            {cleanTitle(pebble.title)}
           </p>
         </div>
 

@@ -4,6 +4,6 @@ export type TooltipProps = {
   side?: 'top' | 'right' | 'bottom' | 'left';
   align?: 'center' | 'start' | 'end';
   content?: string;
-  type: 'focus-card' | 'basic';
+  type?: 'focus-card' | 'basic';
   children: ReactNode;
 };

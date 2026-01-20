@@ -95,10 +95,6 @@ export default function LoginPage() {
                 disabled={loading}
               />
             </form>
-
-            <p className="mt-4 text-sm text-slate-500">
-              For MVP, any credentials will work
-            </p>
             <div className="mt-6">
               <Link
                 onClick={handleSignUp}

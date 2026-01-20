@@ -10,6 +10,7 @@ import AddPebbleIcon from '@/features/AddPebbleIcon/AddPebbleIcon';
 import FocusCard from '@/features/FocusCard/FocusCard';
 
 import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
+import LocalHeading from '@/components/layout/LocalHeading';
 import OtherPebbles from '@/features/OtherPebbles/OtherPebbles';
 import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
@@ -30,6 +31,7 @@ const DashboardClient = () => {
 
   const hasPebbles = pebbles.length > 0;
 
+  console.log('himom!', pebbles);
   return (
     <>
       <div className="min-h-screen w-screen bg-white pt-12">
@@ -44,7 +46,7 @@ const DashboardClient = () => {
         {!hasPebbles && (
           <CenteredComponent>
             <PebblesEmptyState
-              hasFocus={focusStatus === 'empty'}
+              hasFocus={focusStatus !== 'empty'}
               onAddPebble={() => setIsModalOpen(true)}
             />
           </CenteredComponent>
@@ -53,7 +55,15 @@ const DashboardClient = () => {
         {hasPebbles && (
           <>
             <CenteredComponent>
-              <PrimaryFocusPebble primaryFocusPebble={pebbles[3]} />
+              <div className="mb-4 w-full max-w-4xl">
+                <LocalHeading label="Focused Pebbles" />
+                <p className="text-xs tracking-[0.05em] text-slate-400">
+                  If you do only one thing today, start here
+                </p>
+              </div>
+            </CenteredComponent>
+            <CenteredComponent>
+              <PrimaryFocusPebble primaryFocusPebble={pebbles[0]} />
             </CenteredComponent>
 
             <CenteredComponent>

@@ -1,4 +1,4 @@
-import extractTitleFromHtml from '@/lib/urls/extractTitle';
+import extractTitleFromHtml from '@/lib/urls/cleanTitle';
 
 export async function POST(req: Request) {
   const { url } = await req.json();
