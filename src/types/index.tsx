@@ -5,9 +5,11 @@ export type {
   AddPebbleResult,
 } from '@/types/addPebble';
 export type { ApiError, RequestOptions } from '@/types/api';
+export type { ButtonProps } from '@/types/button';
 export type { Category, Link } from '@/types/supabase';
 export type { Pebble, OtherPebbleGroup } from '@/types/pebble';
 export type { ModalProps } from '@/types/modal';
 export type { TooltipProps } from '@/types/tooltip';
 export type { FocusState } from '@/types/focusCard';
+export type { Star } from '@/types/star';
 export type { TTextArea } from '@/types/textarea';
