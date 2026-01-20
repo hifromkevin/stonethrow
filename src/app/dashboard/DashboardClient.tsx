@@ -31,6 +31,7 @@ const DashboardClient = () => {
 
   const hasPebbles = pebbles.length > 0;
 
+  console.log('himom!', pebbles);
   return (
     <>
       <div className="min-h-screen w-screen bg-white pt-12">
@@ -62,7 +63,7 @@ const DashboardClient = () => {
               </div>
             </CenteredComponent>
             <CenteredComponent>
-              <PrimaryFocusPebble primaryFocusPebble={pebbles[3]} />
+              <PrimaryFocusPebble primaryFocusPebble={pebbles[0]} />
             </CenteredComponent>
 
             <CenteredComponent>

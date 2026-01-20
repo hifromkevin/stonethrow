@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Pebble } from '@/types';
 import StarIcon from '@/components/ui/StarIcon';
+import cleanTitle from '@/lib/urls/cleanTitle';
 
 const OtherPebblesItemRow = ({ pebble }: { pebble: Pebble }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -18,7 +19,7 @@ const OtherPebblesItemRow = ({ pebble }: { pebble: Pebble }) => {
         {/* TITLE */}
         <div className="min-w-0">
           <p className="truncate text-sm font-medium text-slate-900">
-            {pebble.title}
+            {cleanTitle(pebble.title)}
           </p>
         </div>
 

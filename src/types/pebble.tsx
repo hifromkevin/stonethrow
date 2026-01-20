@@ -10,42 +10,26 @@ export type Pebble = {
   title: string;
   canonical_url: string;
   original_url: string;
+  description?: string;
   domain: string;
   notes?: string;
   group_name: string;
   group_color: string;
   is_starred: boolean;
   is_archived: boolean;
+  image_url?: string;
+
   created_at: string;
-
-  // TODO: Determine ALL fields required to make Pebbles useful
-
-  //   user_signals {
-  //   starred
-  //   completed
-  //   skipped_count
-  //   open_count
-  //   last_opened_at
-  // }
-
-  // source_type: 'video' | 'article' | 'image' | 'repo' | 'interactive/class' | 'audio' | 'other';
-  // focus_state: 'focused' | 'unfocused';
-  // topics: Topic[];
-
-  // estimated_time:
-  // | 'quick'        // ≤10 min
-  // | 'short'        // 10–30 min
-  // | 'session'      // 30–90 min
-  // | 'deep'         // 1.5–3 hrs
-  // | 'project'      // 3+ hrs
-
-  // difficulty          // beginner | intermediate | advanced
-  // intent_tags         // tutorial | reference | inspiration | overview | opinion [] // ex: [tutorial, reference]
-  // topic_embeddings    // vector
-  // freshness_score     // How risky is the content of being outdated. EX: Guitar: Decays slowly. React? Decays FAST. API Docs: Hard decay. Philosophy: Barely decays.
-  // freshness_score = base_score * topic_decay_factor
-  // user_signals        // starred, completed, skipped
-  // content_access = 'full' | 'partial' | 'none'
+  source_type?: string;
+  status: 'inbox' | 'active' | 'completed' | 'archived';
+  ai_summary?: string;
+  ai_tags: string[];
+  feedback_rating?: number;
+  feedback_reason?: string;
+  completed_at?: string;
+  last_interacted_at?: string;
+  image_source?: 'og' | 'twitter' | 'youtube' | 'dom' | 'fallback';
+  is_upvoted: boolean;
 };
 
 export type OtherPebbleGroup = {
