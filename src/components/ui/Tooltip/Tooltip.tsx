@@ -19,7 +19,7 @@ const Tooltip = ({
   };
 
   return (
-    <span className="group/tooltip relative inline-flex h-5 w-5 cursor-help items-center justify-center">
+    <span className="group/tooltip relative inline-flex cursor-help items-center">
       {children}
 
       <div

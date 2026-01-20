@@ -13,7 +13,7 @@ const PebblesEmptyState = ({ hasFocus, onAddPebble }: Props) => {
       <p className="mt-4 text-lg text-slate-600">
         Add all of your links and videos (we call them{' '}
         <span className="font-medium">Pebbles</span>) here
-        {!hasFocus && ', then set a Focus'}, and we’ll take care of the rest.
+        {!hasFocus && ', then set a Focus'}, and we'll take care of the rest.
       </p>
 
       <button

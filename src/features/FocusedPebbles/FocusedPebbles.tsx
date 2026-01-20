@@ -9,18 +9,8 @@ const FocusedPebbles = ({ savedPebbles }: { savedPebbles: Pebble[] }) => {
   const COLUMN_SPACING = 'grid-cols-[32px_1fr_30px_40px]';
 
   return (
-    <div className="mx-8 w-full max-w-5xl">
-      <LocalHeading label="Focused Pebbles" />
-
+    <div className="mx-8 w-full max-w-4xl">
       <div className="mt-3 rounded-t-xl border border-slate-200 bg-white">
-        <div
-          className={`grid ${COLUMN_SPACING} gap-4 border-b border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-500`}
-        >
-          <span />
-          <span className="tracking-[0.02em]">Pebble Name</span>
-          <span>Why?</span>
-          <span />
-        </div>
         <div className="divide-y divide-slate-100">
           {savedPebbles.map((pebble) => (
             <FocusedPebblesRow

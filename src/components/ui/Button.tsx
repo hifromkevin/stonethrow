@@ -1,11 +1,4 @@
-interface ButtonProps {
-  label: string;
-  clickFn?: React.MouseEventHandler<HTMLButtonElement>;
-  variant?: 'primary' | 'secondary';
-  type?: 'button' | 'submit' | 'reset';
-  overrides?: string;
-  disabled?: boolean;
-}
+import { ButtonProps } from '@/types';
 
 const base =
   'cursor-pointer inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-medium transition-colors focus:outline-none';
@@ -18,12 +11,12 @@ const variants = {
 };
 
 const Button = ({
-  label,
   clickFn,
-  variant = 'primary',
+  disabled = false,
+  label,
   type = 'button',
   overrides,
-  disabled = false,
+  variant = 'primary',
 }: ButtonProps) => {
   return (
     <button
