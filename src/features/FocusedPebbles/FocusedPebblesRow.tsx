@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import Tooltip from '@/components/ui/Tooltip/Tooltip';
-import { Pebble } from '@/types';
-import decodeHtmlEntities from '@/lib/urls/decodeHtmlTitles';
 import { CircleQuestionMark } from 'lucide-react';
+
 import EllipsisIcon from '@/components/ui/Ellipsis';
-import StarIcon from '@/components/ui/StarIcon';
+import Tooltip from '@/components/ui/Tooltip/Tooltip';
+
+import { Pebble } from '@/types';
+
 import cleanTitle from '@/lib/urls/cleanTitle';
+
+import useDeletePebble from '@/lib/mutations/useDeletePebble';
 
 const stripProtocol = (url: string) =>
   url ? url.replace(/^[a-zA-Z]+:\/\//, '').replace(/^www\./, '') : null;
@@ -20,7 +23,6 @@ const FocusedPebbleRow = ({
   const [menuOpen, setMenuOpen] = useState(false);
   const [isStarSelected, setIsStarSelected] = useState(pebble.is_starred);
   const onComplete = (id: string) => console.log('complete', id);
-  const onDelete = (id: string) => console.log('delete', id);
   //TODO: handle data changes here
   const onStarChange = (id: string, isStarred: boolean) =>
     console.log('star change', id, isStarred);
@@ -28,13 +30,19 @@ const FocusedPebbleRow = ({
   const handleMenu = (action: 'complete' | 'delete') => {
     setMenuOpen(false);
     if (action === 'complete') onComplete(pebble.id);
-    if (action === 'delete') onDelete(pebble.id);
+  };
+
+  const deletePebble = useDeletePebble();
+
+  const onDelete = () => {
+    if (!confirm('Remove this Pebble?')) return;
+
+    deletePebble.mutate(pebble.id);
   };
 
   return (
-    <div className="group grid grid-cols-[50px_1fr_auto] items-center gap-4 border border-slate-200 bg-white px-2 py-2 hover:bg-slate-50">
-      {/* Image */}
-      <div className="h-12 w-12 overflow-hidden rounded-lg bg-slate-100">
+    <div className="group grid grid-cols-[auto_1fr_auto] items-center gap-2 overflow-hidden bg-white hover:bg-slate-50">
+      <div className="aspect-square w-22 shrink-0 overflow-hidden">
         <img
           src={pebble?.image_url}
           alt={pebble?.description}
@@ -44,14 +52,20 @@ const FocusedPebbleRow = ({
 
       <div className="min-w-0">
         <div className="flex items-center justify-between gap-4">
-          <div className="min-w-0">
-            <h3 className="truncate text-base font-semibold text-slate-600">
-              {cleanTitle(pebble.title)}
-            </h3>
-
-            <p className="mt-0.5 truncate text-sm text-slate-400">
-              ({pebble.domain ? pebble.domain : pebble.canonical_url})
+          <div className="min-w-0 py-2">
+            <p className="truncate text-base font-semibold text-slate-600">
+              <a href={pebble?.canonical_url} target="_blank">
+                {cleanTitle(pebble.title)}
+              </a>
             </p>
+
+            <a
+              className="truncate text-sm text-slate-400"
+              href={pebble?.canonical_url}
+              target="_blank"
+            >
+              ({pebble.domain ? pebble.domain : pebble.canonical_url})
+            </a>
             <div className="mt-2 flex flex-wrap gap-2">
               <div className="flex flex-wrap items-start gap-2 text-xs text-slate-600">
                 <span>High ROI</span>
@@ -71,7 +85,7 @@ const FocusedPebbleRow = ({
 
       {/* Ellipsis menu */}
       <div className="flex pt-1">
-        <EllipsisIcon />
+        <EllipsisIcon url={pebble?.canonical_url} onDelete={onDelete} />
       </div>
     </div>
   );

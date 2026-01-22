@@ -2,8 +2,8 @@
 
 import { useState } from 'react';
 import { Search } from 'lucide-react';
-import useAuth from '../../lib/queries/useAuth';
-import { useRouter } from 'next/navigation';
+import useAuth from '@/lib/queries/useAuth';
+import SignOutButton from '@/components/layout/SignOutButton';
 
 export default function Header() {
   const { signOut } = useAuth();
@@ -37,12 +37,7 @@ export default function Header() {
             <div className="h-6 w-6 rounded-full bg-slate-300"></div>
           </button>
 
-          <button
-            onClick={signOut}
-            className="btn-secondary cursor-pointer text-sm"
-          >
-            Sign Out
-          </button>
+          <SignOutButton />
         </div>
       </div>
     </header>

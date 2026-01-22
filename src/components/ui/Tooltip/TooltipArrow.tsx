@@ -11,7 +11,8 @@ const TooltipArrow = ({
   };
 
   const alignClasses = {
-    top: 'left-1/2 -translate-x-1/2',
+    // top: 'left-1/2 -translate-x-1/2',
+    top: 'right-2',
     bottom: 'left-1/2 -translate-x-1/2',
     left: 'top-1/2 -translate-y-1/2',
     right: 'top-1/2 -translate-y-1/2',

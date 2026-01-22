@@ -3,10 +3,14 @@
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import NarrowComponent from '@/components/layout/NarrowComponent';
 import Sidebar from '@/components/ui/Sidebar';
 import TextArea from '@/components/ui/TextArea';
+import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
 import LocalHeading from '@/components/layout/LocalHeading';
+
+import { CircleQuestionMark } from 'lucide-react';
 
 const FocusCard = ({
   focusStatus,
@@ -22,8 +26,14 @@ const FocusCard = ({
   const isEmpty = focusStatus === 'empty';
 
   return (
-    <div className="m-8 w-full max-w-4xl">
-      <LocalHeading label="Current Focus" />
+    <NarrowComponent adtlStyles="my-8">
+      <LocalHeading label="Current Focus" />{' '}
+      <Tooltip type="focus-card" side="right">
+        <CircleQuestionMark
+          className="text-slate-500 hover:bg-slate-100"
+          size={16}
+        />
+      </Tooltip>
       {isEmpty && (
         <span className="w-2bg-red-400 ml-3 inline-block h-2 align-middle" />
       )}
@@ -111,7 +121,7 @@ const FocusCard = ({
           </div>
         </Card>
       </div>
-    </div>
+    </NarrowComponent>
   );
 };
 

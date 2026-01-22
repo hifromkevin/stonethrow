@@ -9,7 +9,7 @@ export type { ButtonProps } from '@/types/button';
 export type { Category, Link } from '@/types/supabase';
 export type { FocusState } from '@/types/focusCard';
 export type { HtmlMetadata } from '@/types/htmlMetadata';
-export type { ModalProps } from '@/types/modal';
+export type { AddPebbleModalProps } from '@/types/addPebbleModal';
 export type { Pebble, OtherPebbleGroup } from '@/types/pebble';
 export type { Star } from '@/types/star';
 export type { TooltipProps } from '@/types/tooltip';

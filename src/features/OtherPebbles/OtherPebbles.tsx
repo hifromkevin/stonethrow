@@ -1,4 +1,6 @@
 import { Focus } from 'lucide-react';
+import LocalHeading from '@/components/layout/LocalHeading';
+import NarrowComponent from '@/components/layout/NarrowComponent';
 import OtherPebblesGroup from '@/features/OtherPebbles/OtherPebblesGroup';
 
 const otherPebbles = [
@@ -57,14 +59,15 @@ const otherPebbles = [
 
 const OtherPebbles = () => {
   return (
-    <div className="m-8 w-full max-w-5xl">
-      <h2>Other Pebbles</h2>
+    <NarrowComponent adtlStyles="mt-8">
+      {/* m-8 */}
+      <LocalHeading label="Other Pebbles" />
       <div className="mt-3 divide-y divide-slate-100">
         {otherPebbles.map((group, idx) => (
           <OtherPebblesGroup pebbleGroup={group} key={`${group.id}-${idx}`} />
         ))}
       </div>
-    </div>
+    </NarrowComponent>
   );
 };
 

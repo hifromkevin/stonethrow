@@ -2,14 +2,14 @@
 
 import { useState } from 'react';
 
-import { ModalProps } from '@/types';
+import { AddPebbleModalProps } from '@/types';
 import Button from '@/components/ui/Button';
 import useAddPebble from '@/lib/mutations/useAddPebble';
 import { getAddPebbleErrorMessage } from '@/lib/errors/getAddPebbleErrorMessage';
 
 import { AddPebbleSuccess, AddPebbleFailure } from '@/types';
 
-const Modal = ({ isOpen, onClose }: ModalProps) => {
+const AddPebbleModal = ({ isOpen, onClose }: AddPebbleModalProps) => {
   if (!isOpen) return null;
 
   const [pebbleError, setPebbleError] = useState<string | null>(null);
@@ -80,4 +80,4 @@ const Modal = ({ isOpen, onClose }: ModalProps) => {
   );
 };
 
-export default Modal;
+export default AddPebbleModal;

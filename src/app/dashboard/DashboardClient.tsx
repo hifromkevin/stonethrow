@@ -4,7 +4,8 @@ import usePebbles from '@/lib/queries/client/usePebbles';
 
 import CenteredComponent from '@/components/layout/CenteredComponent';
 import Header from '@/components/layout/Header';
-import Modal from '@/components/layout/Modal';
+import AddPebbleModal from '@/components/layout/AddPebbleModal';
+import NarrowComponent from '@/components/layout/NarrowComponent';
 
 import AddPebbleIcon from '@/features/AddPebbleIcon/AddPebbleIcon';
 import FocusCard from '@/features/FocusCard/FocusCard';
@@ -26,8 +27,6 @@ const DashboardClient = () => {
     isLoading: pebblesLoading,
     error: pebblesError,
   } = usePebbles();
-  if (pebblesLoading) return <div>Loading…</div>;
-  if (pebblesError) return <div>Failed to load pebbles</div>;
 
   const hasPebbles = pebbles.length > 0;
 
@@ -42,7 +41,8 @@ const DashboardClient = () => {
             setFocusStatus={setFocusStatus}
           />
         </CenteredComponent>
-
+        {pebblesLoading && <div>Loading…</div>}
+        {pebblesError && <div>Failed to load pebbles</div>}
         {!hasPebbles && (
           <CenteredComponent>
             <PebblesEmptyState
@@ -51,16 +51,15 @@ const DashboardClient = () => {
             />
           </CenteredComponent>
         )}
-
         {hasPebbles && (
           <>
             <CenteredComponent>
-              <div className="mb-4 w-full max-w-4xl">
+              <NarrowComponent adtlStyles="mb-4">
                 <LocalHeading label="Focused Pebbles" />
                 <p className="text-xs tracking-[0.05em] text-slate-400">
                   If you do only one thing today, start here
                 </p>
-              </div>
+              </NarrowComponent>
             </CenteredComponent>
             <CenteredComponent>
               <PrimaryFocusPebble primaryFocusPebble={pebbles[0]} />
@@ -75,15 +74,14 @@ const DashboardClient = () => {
             </CenteredComponent>
           </>
         )}
-
         <div className="fixed right-6 bottom-6 xl:right-[calc(40%-40rem/2)]">
           <AddPebbleIcon handleClick={() => setIsModalOpen(true)} />
         </div>
       </div>
-      <Modal
+      <AddPebbleModal
         isOpen={isModalOpen}
         onClose={(shouldSaveAndClose: boolean) => setIsModalOpen(false)}
-      ></Modal>
+      />
     </>
   );
 };

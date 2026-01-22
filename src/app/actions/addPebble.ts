@@ -5,14 +5,13 @@ import canonicalizeUrl from '@/lib/urls/canonicalizeUrl';
 import extractDomain from '@/lib/urls/extractDomain';
 import extractHtmlMetadata from '@/lib/urls/extractHtmlMetadata';
 import cleanTitle from '@/lib/urls/cleanTitle';
-import requireUser from '@/lib/auth/server/requireUser';
 
 import type { AddPebbleResult } from '@/types';
 
-const addPebble = async (rawUrl: string): Promise<AddPebbleResult> => {
-  const user = await requireUser();
-  if (!user) return { ok: false, error: 'UNAUTHORIZED' };
-
+const addPebble = async (
+  rawUrl: string,
+  userId: string
+): Promise<AddPebbleResult> => {
   const canonicalUrl = canonicalizeUrl(rawUrl);
   const supabase = await createClient();
   const meta = await extractHtmlMetadata(canonicalUrl);
@@ -20,7 +19,7 @@ const addPebble = async (rawUrl: string): Promise<AddPebbleResult> => {
   const { data, error } = await supabase
     .from('pebbles')
     .insert({
-      user_id: user.id,
+      user_id: userId,
       original_url: rawUrl,
       canonical_url: canonicalUrl,
       domain: extractDomain(rawUrl),
