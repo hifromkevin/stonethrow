@@ -6,6 +6,7 @@ import { AddPebbleFailure, AddPebbleSuccess } from '@/types/addPebble';
 const postPebble = async (url: string) => {
   const res = await fetch('/api/pebbles', {
     method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ url }),
   });
