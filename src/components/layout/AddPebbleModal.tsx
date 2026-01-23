@@ -70,7 +70,7 @@ const AddPebbleModal = ({ isOpen, onClose }: AddPebbleModalProps) => {
             />
             <Button
               type="submit"
-              label={isPending ? 'Adding…' : 'Add Pebble'}
+              label={isPending ? 'Adding...' : 'Add Pebble'}
               disabled={isPending}
             />
           </div>
