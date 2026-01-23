@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { OtherPebbleGroup } from '@/types';
 
-import OtherPebblesItemRow from '@/features/OtherPebbles/OtherPebblesItemRow';
+import OtherPebblesItemRow from '@/features/OtherPebblesOld/OtherPebblesItemRow';
 
 const OtherPebblesGroup = ({
   pebbleGroup,

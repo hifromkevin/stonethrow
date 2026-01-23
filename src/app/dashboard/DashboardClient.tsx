@@ -12,7 +12,7 @@ import FocusCard from '@/features/FocusCard/FocusCard';
 
 import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
 import LocalHeading from '@/components/layout/LocalHeading';
-import OtherPebbles from '@/features/OtherPebbles/OtherPebbles';
+import OtherPebbles from '@/features/OtherPebblesOld/OtherPebbles';
 import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
@@ -41,9 +41,11 @@ const DashboardClient = () => {
             setFocusStatus={setFocusStatus}
           />
         </CenteredComponent>
-        {pebblesLoading && <div>Loading…</div>}
-        {pebblesError && <div>Failed to load pebbles</div>}
-        {!hasPebbles && (
+        <CenteredComponent>
+          {pebblesLoading && <div>Loading...</div>}
+          {pebblesError && <div>Failed to load pebbles</div>}
+        </CenteredComponent>
+        {!hasPebbles && !pebblesLoading && (
           <CenteredComponent>
             <PebblesEmptyState
               hasFocus={focusStatus !== 'empty'}
