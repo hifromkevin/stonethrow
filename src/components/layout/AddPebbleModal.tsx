@@ -1,19 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-
-import { AddPebbleModalProps } from '@/types';
+import { useState, useId } from 'react';
 import Button from '@/components/ui/Button';
 import useAddPebble from '@/lib/mutations/useAddPebble';
 import { getAddPebbleErrorMessage } from '@/lib/errors/getAddPebbleErrorMessage';
-
-import { AddPebbleSuccess, AddPebbleFailure } from '@/types';
+import {
+  AddPebbleModalProps,
+  AddPebbleSuccess,
+  AddPebbleFailure,
+} from '@/types';
 
 const AddPebbleModal = ({ isOpen, onClose }: AddPebbleModalProps) => {
   if (!isOpen) return null;
 
-  const [pebbleError, setPebbleError] = useState<string | null>(null);
+  const titleId = useId();
+  const errorId = useId();
 
+  const [pebbleError, setPebbleError] = useState<string | null>(null);
   const { mutate: addPebble, isPending } = useAddPebble();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -42,26 +45,43 @@ const AddPebbleModal = ({ isOpen, onClose }: AddPebbleModalProps) => {
       <div
         className="absolute inset-0 bg-black/30"
         onClick={() => onClose(false)}
+        aria-hidden="true"
       />
 
-      <div className="relative z-10 w-full max-w-md rounded-md bg-white p-6 shadow-xl">
-        <h2>Add a Pebble</h2>
+      <dialog
+        open
+        aria-labelledby={titleId}
+        aria-describedby={pebbleError ? errorId : undefined}
+        className="relative z-10 w-full max-w-md rounded-md bg-white p-6 shadow-xl"
+      >
+        <header className="mb-4">
+          <h2 id={titleId} className="text-lg font-semibold">
+            Add a Pebble
+          </h2>
+        </header>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <label htmlFor="pebble-url" className="sr-only">
+            Pebble URL
+          </label>
+
           <input
+            id="pebble-url"
             name="url"
             type="url"
             required
             placeholder="Paste a link to an article or video here"
-            className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:outline-none"
             disabled={isPending}
+            className="w-full rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:outline-none"
           />
 
           {pebbleError && (
-            <p className="mt-2 text-sm text-red-600">{pebbleError}</p>
+            <p id={errorId} role="alert" className="text-sm text-red-600">
+              {pebbleError}
+            </p>
           )}
 
-          <div className="mt-6 flex justify-end gap-3">
+          <footer className="flex justify-end gap-3 pt-2">
             <Button
               label="Cancel"
               variant="secondary"
@@ -73,9 +93,9 @@ const AddPebbleModal = ({ isOpen, onClose }: AddPebbleModalProps) => {
               label={isPending ? 'Adding...' : 'Add Pebble'}
               disabled={isPending}
             />
-          </div>
+          </footer>
         </form>
-      </div>
+      </dialog>
     </div>
   );
 };
