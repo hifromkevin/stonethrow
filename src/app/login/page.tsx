@@ -37,8 +37,8 @@ export default function LoginPage() {
 
   return (
     <>
-      <div className="flex min-h-screen w-screen items-center justify-center bg-slate-100">
-        <CenteredComponent>
+      <main className="flex min-h-screen w-screen items-center justify-center bg-slate-100">
+        <CenteredComponent ariaLabel="login-card">
           <Card className="m-10 w-full max-w-xl">
             <div className="flex flex-col items-center px-6 py-6 text-center">
               <img src="/logo.svg" alt="stonethrow" className="h-12" />
@@ -51,11 +51,15 @@ export default function LoginPage() {
                 }}
               >
                 <div className="space-y-2 text-left">
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="login-email"
+                  >
                     Email
                   </label>
 
                   <input
+                    id="login-email"
                     type="email"
                     placeholder="Email"
                     className="mb-3 w-full rounded border px-3 py-2"
@@ -65,10 +69,14 @@ export default function LoginPage() {
                 </div>
 
                 <div className="space-y-2 text-left">
-                  <label className="block text-sm font-medium text-slate-700">
+                  <label
+                    className="block text-sm font-medium text-slate-700"
+                    htmlFor="login-password"
+                  >
                     Password
                   </label>
                   <input
+                    id="login-password"
                     type="password"
                     placeholder="Password"
                     className="mb-4 w-full rounded border px-3 py-2"
@@ -76,7 +84,11 @@ export default function LoginPage() {
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
-                {error && <p className="mb-3 text-sm text-red-600">{error}</p>}
+                {error && (
+                  <p role="alert" className="mb-3 text-sm text-red-600">
+                    {error}
+                  </p>
+                )}
 
                 <Button
                   label="Sign in"
@@ -86,7 +98,7 @@ export default function LoginPage() {
                 />
               </form>
 
-              <div className="mt-6 w-full">
+              <footer className="mt-6 w-full">
                 <Button
                   label="Don't have a Stonethrow account? Sign up"
                   type="button"
@@ -94,11 +106,11 @@ export default function LoginPage() {
                   overrides="w-full"
                   clickFn={() => setShowSignUp(true)}
                 />
-              </div>
+              </footer>
             </div>
           </Card>
         </CenteredComponent>
-      </div>
+      </main>
 
       <SignUpModal open={showSignUp} onClose={() => setShowSignUp(false)} />
     </>

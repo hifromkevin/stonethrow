@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { useRouter } from 'next/navigation';
 import useAuth from '@/lib/queries/useAuth';
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { Sign } from 'crypto';
 
 const SignUpModal = ({
   open,
@@ -15,6 +14,9 @@ const SignUpModal = ({
   open: boolean;
   onClose: () => void;
 }) => {
+  const titleId = useId();
+  const errorId = useId();
+
   const { signUp } = useAuth();
   const router = useRouter();
 
@@ -25,7 +27,8 @@ const SignUpModal = ({
 
   if (!open) return null;
 
-  const handleSignUp = async () => {
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
     setLoading(true);
     setError(null);
 
@@ -43,60 +46,88 @@ const SignUpModal = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <Card className="w-full max-w-md p-6">
-        <div className="mb-6 text-center">
-          <h2 className="text-xl font-semibold">
-            Create your Stonethrow account
-          </h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Get your ideas organized in minutes
-          </p>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Email
-            </label>
-            <input
-              type="email"
-              className="w-full rounded border px-3 py-2"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+      <dialog
+        open
+        aria-labelledby={titleId}
+        aria-describedby={error ? errorId : undefined}
+        className="relative z-10 w-full max-w-md"
+      >
+        <Card className="p-6">
+          <header className="mb-6 text-center">
+            <h2 id={titleId} className="text-xl font-semibold">
+              Create your Stonethrow account
+            </h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Get your ideas organized in minutes
+            </p>
+          </header>
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700">
-              Password
-            </label>
-            <input
-              type="password"
-              className="w-full rounded border px-3 py-2"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+          <form onSubmit={handleSignUp} className="space-y-4">
+            <div>
+              <label
+                htmlFor="signup-email"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Email
+              </label>
+              <input
+                id="signup-email"
+                type="email"
+                required
+                className="w-full rounded border px-3 py-2"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+            <div>
+              <label
+                htmlFor="signup-password"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Password
+              </label>
+              <input
+                id="signup-password"
+                type="password"
+                required
+                className="w-full rounded border px-3 py-2"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-          <div className="flex gap-2 pt-2">
-            <Button
-              label="Create account"
-              overrides="w-full"
-              disabled={loading}
-              clickFn={handleSignUp}
-            />
-            <Button
-              label="Cancel"
-              variant="secondary"
-              overrides="w-full"
-              clickFn={onClose}
-            />
-          </div>
-        </div>
-      </Card>
+            {error && (
+              <p id={errorId} role="alert" className="text-sm text-red-600">
+                {error}
+              </p>
+            )}
+
+            <footer className="flex gap-2 pt-2">
+              <Button
+                label="Create account"
+                type="submit"
+                overrides="w-full"
+                disabled={loading}
+              />
+              <Button
+                label="Cancel"
+                variant="secondary"
+                overrides="w-full"
+                type="button"
+                clickFn={onClose}
+              />
+            </footer>
+          </form>
+        </Card>
+      </dialog>
     </div>
   );
 };

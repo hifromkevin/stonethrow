@@ -5,7 +5,10 @@ type Props = {
 
 const PebblesEmptyState = ({ hasFocus, onAddPebble }: Props) => {
   return (
-    <div className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-slate-50 p-8 text-center">
+    <section
+      aria-labelledby="empty-state-heading"
+      className="mx-auto max-w-lg rounded-xl border border-slate-200 bg-slate-50 p-8 text-center"
+    >
       <h2 className="text-2xl font-semibold text-slate-800">
         Welcome to Stonethrow!
       </h2>
@@ -22,7 +25,7 @@ const PebblesEmptyState = ({ hasFocus, onAddPebble }: Props) => {
       >
         Add your first Pebble
       </button>
-    </div>
+    </section>
   );
 };
 

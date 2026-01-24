@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CircleQuestionMark } from 'lucide-react';
 
-import EllipsisIcon from '@/components/ui/Ellipsis';
+import EllipsisIcon from '@/components/ui/Ellipsis/EllipsisIcon';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
 import { Pebble } from '@/types';
@@ -41,20 +41,24 @@ const FocusedPebbleRow = ({
   };
 
   return (
-    <div className="group grid grid-cols-[auto_1fr_auto] items-center gap-2 overflow-hidden bg-white hover:bg-slate-50">
-      <div className="aspect-square w-22 shrink-0 overflow-hidden">
+    <article className="group grid grid-cols-[auto_1fr_auto] items-center gap-2 overflow-hidden bg-white hover:bg-slate-50">
+      <figure className="aspect-square w-22 shrink-0 overflow-hidden">
         <img
           src={pebble?.image_url}
-          alt={pebble?.description}
+          alt={pebble?.description || pebble?.title || 'Pebble Image'}
           className="h-full w-full object-cover"
         />
-      </div>
+      </figure>
 
       <div className="min-w-0">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0 py-2">
             <p className="truncate text-base font-semibold text-slate-600">
-              <a href={pebble?.canonical_url} target="_blank">
+              <a
+                href={pebble?.canonical_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {cleanTitle(pebble.title)}
               </a>
             </p>
@@ -63,6 +67,7 @@ const FocusedPebbleRow = ({
               className="truncate text-sm text-slate-400"
               href={pebble?.canonical_url}
               target="_blank"
+              rel="noopener noreferrer"
             >
               ({pebble.domain ? pebble.domain : pebble.canonical_url})
             </a>
@@ -87,7 +92,7 @@ const FocusedPebbleRow = ({
       <div className="flex pt-1">
         <EllipsisIcon url={pebble?.canonical_url} onDelete={onDelete} />
       </div>
-    </div>
+    </article>
   );
 };
 export default FocusedPebbleRow;

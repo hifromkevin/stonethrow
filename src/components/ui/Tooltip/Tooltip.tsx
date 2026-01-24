@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import TooltipArrow from '@/components/ui/Tooltip/TooltipArrow';
 import AboutFocus from './Types/AboutFocus';
 import Portal from '@/components/ui/Portal';
@@ -12,8 +12,15 @@ const Tooltip = ({
   content = '',
   children,
 }: TooltipProps) => {
+  const id = useId();
   const triggerRef = useRef<HTMLSpanElement>(null);
   const [rect, setRect] = useState<DOMRect | null>(null);
+
+  const show = () => {
+    setRect(triggerRef.current?.getBoundingClientRect() ?? null);
+  };
+
+  const hide = () => setRect(null);
 
   const getPosition = () => {
     if (!rect) return {};
@@ -50,14 +57,15 @@ const Tooltip = ({
 
   return (
     <>
-      {/* Trigger */}
       <span
         ref={triggerRef}
-        className="inline-flex cursor-help items-center"
-        onMouseEnter={() =>
-          setRect(triggerRef.current?.getBoundingClientRect() ?? null)
-        }
-        onMouseLeave={() => setRect(null)}
+        tabIndex={0}
+        aria-describedby={rect ? id : undefined}
+        className="inline-flex cursor-help items-center focus:outline-none"
+        onMouseEnter={show}
+        onMouseLeave={hide}
+        onFocus={show}
+        onBlur={hide}
       >
         {children}
       </span>
@@ -65,6 +73,7 @@ const Tooltip = ({
       {rect && (
         <Portal>
           <div
+            id={id}
             role="tooltip"
             style={getPosition()}
             className="pointer-events-none fixed z-[100] w-[22rem] rounded-xl bg-slate-50 px-5 py-4 text-base leading-6 text-slate-900 shadow-lg"

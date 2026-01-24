@@ -20,6 +20,7 @@ const TooltipArrow = ({
 
   return (
     <span
+      aria-hidden="true"
       className={`absolute h-2 w-2 rotate-45 bg-white ${sideClasses[side]} ${alignClasses[side]} `}
     />
   );

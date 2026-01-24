@@ -33,20 +33,20 @@ const DashboardClient = () => {
   console.log('himom!', pebbles);
   return (
     <>
-      <div className="min-h-screen w-screen bg-white pt-12">
+      <main className="min-h-screen w-screen bg-white pt-12">
         <Header />
-        <CenteredComponent>
+        <CenteredComponent ariaLabel="focus-card">
           <FocusCard
             focusStatus={focusStatus}
             setFocusStatus={setFocusStatus}
           />
         </CenteredComponent>
-        <CenteredComponent>
+        <CenteredComponent ariaLabel="polite">
           {pebblesLoading && <div>Loading...</div>}
           {pebblesError && <div>Failed to load pebbles</div>}
         </CenteredComponent>
         {!hasPebbles && !pebblesLoading && (
-          <CenteredComponent>
+          <CenteredComponent ariaLabel="no-pebbles-state">
             <PebblesEmptyState
               hasFocus={focusStatus !== 'empty'}
               onAddPebble={() => setIsModalOpen(true)}
@@ -55,7 +55,7 @@ const DashboardClient = () => {
         )}
         {hasPebbles && (
           <>
-            <CenteredComponent>
+            <CenteredComponent ariaLabel="focused-pebbles">
               <NarrowComponent adtlStyles="mb-4">
                 <LocalHeading label="Focused Pebbles" />
                 <p className="text-xs tracking-[0.05em] text-slate-400">
@@ -63,15 +63,15 @@ const DashboardClient = () => {
                 </p>
               </NarrowComponent>
             </CenteredComponent>
-            <CenteredComponent>
+            <CenteredComponent ariaLabel="primary-focus-pebble">
               <PrimaryFocusPebble primaryFocusPebble={pebbles[0]} />
             </CenteredComponent>
 
-            <CenteredComponent>
+            <CenteredComponent ariaLabel="focused-pebbles-list">
               <FocusedPebbles savedPebbles={pebbles.slice(1)} />
             </CenteredComponent>
 
-            <CenteredComponent>
+            <CenteredComponent ariaLabel="other-pebbles">
               <OtherPebbles />
             </CenteredComponent>
           </>
@@ -79,10 +79,10 @@ const DashboardClient = () => {
         <div className="fixed right-6 bottom-6 xl:right-[calc(40%-40rem/2)]">
           <AddPebbleIcon handleClick={() => setIsModalOpen(true)} />
         </div>
-      </div>
+      </main>
       <AddPebbleModal
         isOpen={isModalOpen}
-        onClose={(shouldSaveAndClose: boolean) => setIsModalOpen(false)}
+        onClose={() => setIsModalOpen(false)}
       />
     </>
   );

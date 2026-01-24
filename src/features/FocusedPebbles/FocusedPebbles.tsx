@@ -1,4 +1,3 @@
-import { prioritizedPebbles } from '@/lib/mockData';
 import { Pebble } from '@/types';
 
 import { Focus } from 'lucide-react';
@@ -10,7 +9,7 @@ const FocusedPebbles = ({ savedPebbles }: { savedPebbles: Pebble[] }) => {
 
   return (
     <NarrowComponent>
-      <div className="mt-3 border border-slate-200 bg-white">
+      <div className="mt-3 rounded-t-xl border border-slate-200 bg-white">
         <div className="divide-y divide-slate-100">
           {savedPebbles.map((pebble) => (
             <FocusedPebblesRow

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { CircleQuestionMark } from 'lucide-react';
 
-import EllipsisIcon from '@/components/ui/Ellipsis';
+import EllipsisIcon from '@/components/ui/Ellipsis/EllipsisIcon';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
 import { Pebble } from '@/types';
