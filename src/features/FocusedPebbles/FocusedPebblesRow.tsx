@@ -15,10 +15,10 @@ const stripProtocol = (url: string) =>
 
 const FocusedPebbleRow = ({
   pebble,
-  COLUMN_SPACING,
+  onDelete,
 }: {
   pebble: Pebble;
-  COLUMN_SPACING: string;
+  onDelete: (pebbleId: string) => void;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isStarSelected, setIsStarSelected] = useState(pebble.is_starred);
@@ -30,14 +30,6 @@ const FocusedPebbleRow = ({
   const handleMenu = (action: 'complete' | 'delete') => {
     setMenuOpen(false);
     if (action === 'complete') onComplete(pebble.id);
-  };
-
-  const deletePebble = useDeletePebble();
-
-  const onDelete = () => {
-    if (!confirm('Remove this Pebble?')) return;
-
-    deletePebble.mutate(pebble.id);
   };
 
   return (
@@ -88,9 +80,12 @@ const FocusedPebbleRow = ({
         </div>
       </div>
 
-      {/* Ellipsis menu */}
       <div className="flex pt-1">
-        <EllipsisIcon url={pebble?.canonical_url} onDelete={onDelete} />
+        <EllipsisIcon
+          url={pebble?.canonical_url}
+          onDelete={onDelete}
+          pebbleId={pebble.id}
+        />
       </div>
     </article>
   );

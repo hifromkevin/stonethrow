@@ -16,6 +16,8 @@ import OtherPebbles from '@/features/OtherPebblesOld/OtherPebbles';
 import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
+import useDeletePebble from '@/lib/mutations/useDeletePebble';
+
 import { FocusState } from '@/types';
 
 const DashboardClient = () => {
@@ -29,6 +31,13 @@ const DashboardClient = () => {
   } = usePebbles();
 
   const hasPebbles = pebbles.length > 0;
+
+  const deletePebble = useDeletePebble();
+  const onDelete = (pebbleId: string) => {
+    if (!confirm('Remove this Pebble?')) return;
+
+    deletePebble.mutate(pebbleId);
+  };
 
   console.log('himom!', pebbles);
   return (
@@ -64,15 +73,21 @@ const DashboardClient = () => {
               </NarrowComponent>
             </CenteredComponent>
             <CenteredComponent ariaLabel="primary-focus-pebble">
-              <PrimaryFocusPebble primaryFocusPebble={pebbles[0]} />
+              <PrimaryFocusPebble
+                primaryFocusPebble={pebbles[0]}
+                onDelete={onDelete}
+              />
             </CenteredComponent>
 
             <CenteredComponent ariaLabel="focused-pebbles-list">
-              <FocusedPebbles savedPebbles={pebbles.slice(1)} />
+              <FocusedPebbles
+                savedPebbles={pebbles.slice(1)}
+                onDelete={onDelete}
+              />
             </CenteredComponent>
 
             <CenteredComponent ariaLabel="other-pebbles">
-              <OtherPebbles />
+              <OtherPebbles onDelete={onDelete} />
             </CenteredComponent>
           </>
         )}

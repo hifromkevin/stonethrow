@@ -1,14 +1,14 @@
 import LocalHeading from '@/components/layout/LocalHeading';
 import NarrowComponent from '@/components/layout/NarrowComponent';
-import OtherPebblesGroup from '@/features/OtherPebblesOld/OtherPebblesGroup';
-import { Pebbles } from '@/types';
+import SinglePebble from '@/features/OtherPebbles/SinglePebble';
+import { Pebble } from '@/types';
 
-const OtherPebbles = ({ pebbles }: { pebbles: Pebbles[] }) => (
+const OtherPebbles = ({ pebbles }: { pebbles: Pebble[] }) => (
   <NarrowComponent adtlStyles="my-8">
     <LocalHeading label="Other Pebbles" />
     <div className="mt-3 divide-y divide-slate-100">
-      {pebbles.map((group, idx) => (
-        <OtherPebblesGroup pebbleGroup={group} key={`${group.id}-${idx}`} />
+      {pebbles.map((pebble: Pebble, idx: number) => (
+        <SinglePebble pebble={pebble} key={`${pebble.id}-${idx}`} />
       ))}
     </div>
   </NarrowComponent>

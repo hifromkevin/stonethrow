@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import EllipsisMenu from './EllipsisMenu';
 import { Ellipsis } from 'lucide-react';
 
@@ -8,10 +8,12 @@ const EllipsisIcon = ({
   isDefault = true,
   url,
   onDelete,
+  pebbleId,
 }: {
   isDefault?: boolean;
   url: string;
-  onDelete: () => void;
+  onDelete: (pebbleId: string) => void;
+  pebbleId: string;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -48,6 +50,7 @@ const EllipsisIcon = ({
           setIsOpen={setIsOpen}
           url={url}
           onDelete={onDelete}
+          pebbleId={pebbleId}
         />
       )}
     </>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Ellipsis } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 
@@ -10,12 +10,14 @@ const EllipsisMenu = ({
   setIsOpen,
   url,
   onDelete,
+  pebbleId,
 }: {
   rect: DOMRect | null;
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   url: string;
-  onDelete: () => void;
+  onDelete: (pebbleId: string) => void;
+  pebbleId: string;
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -117,7 +119,7 @@ const EllipsisMenu = ({
           role="menuitem"
           onClick={() => {
             setIsOpen(false);
-            onDelete();
+            onDelete(pebbleId);
           }}
           className="flex w-full items-center gap-3 px-4 py-2 text-red-600 hover:bg-red-50"
         >
