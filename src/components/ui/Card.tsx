@@ -7,9 +7,7 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ children, className = '' }) => (
-  <article className={`rounded-md bg-white ring-slate-200 ${className}`}>
-    {children}
-  </article>
+  <article className={className}>{children}</article>
 );
 
 export default Card;
