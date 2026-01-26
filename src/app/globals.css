@@ -1,8 +1,57 @@
 @import 'tailwindcss';
 
+@theme {
+  /* Custom Colors */
+  --color-testpink: #ff00ff;
+
+  /* Custom Keyframes - these will be available for use in animations */
+  @keyframes focusGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(95, 166, 154, 0);
+    }
+    50% {
+      box-shadow: 0 0 14px 2px rgba(95, 166, 154, 0.35);
+    }
+  }
+
+  @keyframes pulse-slow {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  @keyframes focusPulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes halo {
+    0% {
+      transform: scale(1);
+      opacity: 0.35;
+    }
+    100% {
+      transform: scale(1.12);
+      opacity: 0;
+    }
+  }
+}
+
 @layer base {
   :root {
-    --color-primary: #5fa69a; /* your Stonethrow green */
+    --color-primary: #5fa69a;
     --color-primary-hover: #4f9186;
     --color-primary-active: #457f75;
   }
@@ -11,28 +60,27 @@
     font-family: var(--font-inter), system-ui, sans-serif;
   }
 
-  /* h1,
-  h2,
-  h3,
-  h4,
-  h5 {
-    font-family: var(--font-afacad), 
-    system-ui, sans-serif;
-  } */
-
-  /* h1 {
-    font-size: 1.5rem;
-  }
-  h2 {
-    font-size: 1.3rem;
-  }
-  h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-  } */
-
   .subtext {
     font-size: 0.7rem;
     color: var(--color-slate-500);
+  }
+}
+
+@layer utilities {
+  /* Animation utilities using the keyframes defined in @theme */
+  .animate-focusGlow {
+    animation: focusGlow 6s ease-in-out infinite;
+  }
+
+  .animate-focusPulse {
+    animation: focusPulse 6s ease-out infinite;
+  }
+
+  .animate-halo {
+    animation: halo 1200ms ease-out infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 3s ease-in-out infinite;
   }
 }
