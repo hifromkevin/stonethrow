@@ -12,13 +12,14 @@ import FocusCard from '@/features/FocusCard/FocusCard';
 
 import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
 import LocalHeading from '@/components/layout/LocalHeading';
-import OtherPebbles from '@/features/OtherPebblesOld/OtherPebbles';
+import OtherPebbles from '@/features/OtherPebbles/OtherPebbles';
 import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
 import useDeletePebble from '@/lib/mutations/useDeletePebble';
 
 import { FocusState } from '@/types';
+import FocusHeroCard from '@/features/PrimaryFocusPebble/FocusHeroCard';
 
 const DashboardClient = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,7 +43,7 @@ const DashboardClient = () => {
   console.log('himom!', pebbles);
   return (
     <>
-      <main className="min-h-screen w-screen bg-white pt-12">
+      <main className="min-h-screen w-screen bg-white py-20">
         <Header />
         <CenteredComponent ariaLabel="focus-card">
           <FocusCard
@@ -50,6 +51,7 @@ const DashboardClient = () => {
             setFocusStatus={setFocusStatus}
           />
         </CenteredComponent>
+
         <CenteredComponent ariaLabel="polite">
           {pebblesLoading && <div>Loading...</div>}
           {pebblesError && <div>Failed to load pebbles</div>}
@@ -64,19 +66,18 @@ const DashboardClient = () => {
         )}
         {hasPebbles && (
           <>
-            <CenteredComponent ariaLabel="focused-pebbles">
-              <NarrowComponent adtlStyles="mb-4">
-                <LocalHeading label="Focused Pebbles" />
-                <p className="text-xs tracking-[0.05em] text-slate-400">
-                  If you do only one thing today, start here
-                </p>
-              </NarrowComponent>
-            </CenteredComponent>
-            <CenteredComponent ariaLabel="primary-focus-pebble">
-              <PrimaryFocusPebble
+            <CenteredComponent>
+              {/* <NarrowComponent adtlStyles="mb-4  max-w-4xl"> */}
+              <FocusHeroCard
                 primaryFocusPebble={pebbles[0]}
                 onDelete={onDelete}
               />
+              {/* </NarrowComponent> */}
+            </CenteredComponent>
+            <CenteredComponent ariaLabel="focused-pebbles">
+              <NarrowComponent>
+                <LocalHeading label="Focused Pebbles" />
+              </NarrowComponent>
             </CenteredComponent>
 
             <CenteredComponent ariaLabel="focused-pebbles-list">
@@ -87,7 +88,7 @@ const DashboardClient = () => {
             </CenteredComponent>
 
             <CenteredComponent ariaLabel="other-pebbles">
-              <OtherPebbles onDelete={onDelete} />
+              <OtherPebbles pebbles={pebbles.slice(1)} onDelete={onDelete} />
             </CenteredComponent>
           </>
         )}
