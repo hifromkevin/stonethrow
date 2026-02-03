@@ -38,7 +38,7 @@ const TextArea = ({ content, setContent, placeholderText = '' }: TTextArea) => {
         autoResizeTextarea();
       }}
       placeholder={placeholderText}
-      className="w-full resize-none bg-transparent px-0 text-3xl leading-snug font-semibold focus:outline-none"
+      className="w-full resize-none bg-transparent px-0 text-3xl leading-snug font-bold tracking-[0.01em] focus:outline-none"
     />
   );
 };
