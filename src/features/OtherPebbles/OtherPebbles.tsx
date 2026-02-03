@@ -12,7 +12,7 @@ const OtherPebbles = ({
 }) => (
   <NarrowComponent adtlStyles="my-8">
     <LocalHeading label="Other Pebbles" />
-    <div className="mt-3 divide-y divide-slate-100">
+    <div className="mt-3 divide-y divide-slate-100 border border-slate-200">
       {pebbles?.map((pebble: Pebble, idx: number) => (
         <SinglePebble
           pebble={pebble}

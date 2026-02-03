@@ -12,7 +12,7 @@ const FocusedPebbles = ({
   onDelete: (pebbleId: string) => void;
 }) => (
   <NarrowComponent>
-    <div className="mt-3 rounded-t-xl border border-slate-200 bg-white">
+    <div className="mt-1 rounded-t-xl border border-slate-200 bg-white">
       <div className="divide-y divide-slate-100">
         {savedPebbles.map((pebble) => (
           <FocusedPebblesRow

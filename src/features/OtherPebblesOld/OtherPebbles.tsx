@@ -62,7 +62,7 @@ const OtherPebbles = () => {
     <NarrowComponent adtlStyles="mt-8">
       {/* m-8 */}
       <LocalHeading label="Other Pebbles" />
-      <div className="mt-3 divide-y divide-slate-100">
+      <div className="mt-1 divide-y divide-slate-100">
         {otherPebbles.map((group, idx) => (
           <OtherPebblesGroup pebbleGroup={group} key={`${group.id}-${idx}`} />
         ))}

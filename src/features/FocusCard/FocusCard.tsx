@@ -26,10 +26,8 @@ const FocusCard = ({
 
   return (
     <div
-      className={`${isEmpty ? 'animate-focusGlow rounded-lg border-1 border-slate-200' : 'border-b border-slate-200'} mb-12 w-full max-w-2xl bg-white/50 p-6`}
+      className={`${isEmpty ? 'animate-focusGlow rounded-lg border-1 border-slate-200' : 'border-b border-slate-200'} w-full max-w-3xl bg-white/50 p-6`}
     >
-      {/* shadow-[0_0_15px_-5px_rgba(95,166,154,1)] */}
-      {/* <div className="mb-12 w-full max-w-2xl border-y border-slate-200 p-6 ${isEmpty && 'animate-focusGlow rounded-lg bg-white/50 ring-1 ring-slate-400'}"> */}
       <header className="flex items-center gap-2">
         {isEmpty && (
           <span
@@ -47,8 +45,6 @@ const FocusCard = ({
         )}
       </header>
       <Card className="relative pt-1">
-        {/* <Sidebar /> */}
-
         <div
           className={`flex flex-col ${focusStatus !== 'editing' ? 'cursor-pointer' : ''}`}
           onClick={() => {
@@ -59,7 +55,7 @@ const FocusCard = ({
           }}
         >
           <h1
-            className={`text-3xl transition-all duration-300 ${isCommitted ? 'font-semibold' : ''} ${isEditing ? 'hidden' : ''}`}
+            className={`text-3xl font-bold tracking-[0.01em] transition-all duration-300 ${isEditing ? 'hidden' : 'mt-1'}`}
           >
             {isCommitted && focusText
               ? focusText
