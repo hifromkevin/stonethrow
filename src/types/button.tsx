@@ -5,4 +5,6 @@ export interface ButtonProps {
   overrides?: string;
   type?: 'button' | 'submit' | 'reset';
   variant?: 'primary' | 'secondary';
+  href?: string;
+  target?: '_self' | '_blank';
 }

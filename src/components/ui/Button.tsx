@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ButtonProps } from '@/types';
 
 const base =
@@ -17,10 +18,26 @@ const Button = ({
   type = 'button',
   overrides,
   variant = 'primary',
+  href,
+  target = '_blank',
 }: ButtonProps) => {
+  const className = `${base} ${variants[variant]} ${overrides ?? ''}`;
+
+  if (href) {
+    return disabled ? (
+      <button className={className} disabled>
+        {label}
+      </button>
+    ) : (
+      <Link href={href} className={className} target={target}>
+        {label}
+      </Link>
+    );
+  }
+
   return (
     <button
-      className={`${base} ${variants[variant]} ${overrides ?? ''}`}
+      className={className}
       onClick={clickFn}
       type={type}
       disabled={disabled}
