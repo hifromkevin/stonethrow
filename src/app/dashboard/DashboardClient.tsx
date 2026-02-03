@@ -19,7 +19,6 @@ import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble
 import useDeletePebble from '@/lib/mutations/useDeletePebble';
 
 import { FocusState } from '@/types';
-import FocusHeroCard from '@/features/PrimaryFocusPebble/FocusHeroCard';
 
 const DashboardClient = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +42,7 @@ const DashboardClient = () => {
   console.log('himom!', pebbles);
   return (
     <>
-      <main className="min-h-screen w-screen bg-white py-20">
+      <main className="mt-18 mb-10 min-h-screen w-screen bg-white">
         <Header />
         <CenteredComponent ariaLabel="focus-card">
           <FocusCard
@@ -68,7 +67,7 @@ const DashboardClient = () => {
           <>
             <CenteredComponent>
               {/* <NarrowComponent adtlStyles="mb-4  max-w-4xl"> */}
-              <FocusHeroCard
+              <PrimaryFocusPebble
                 primaryFocusPebble={pebbles[0]}
                 onDelete={onDelete}
               />
@@ -76,7 +75,7 @@ const DashboardClient = () => {
             </CenteredComponent>
             <CenteredComponent ariaLabel="focused-pebbles">
               <NarrowComponent>
-                <LocalHeading label="Focused Pebbles" />
+                <LocalHeading label="On Your Radar" />
               </NarrowComponent>
             </CenteredComponent>
 
