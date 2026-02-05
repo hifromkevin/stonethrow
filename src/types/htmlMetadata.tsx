@@ -4,4 +4,6 @@ export type HtmlMetadata = {
   imageSource?: 'og' | 'twitter' | 'youtube' | 'dom';
   description: string | null;
   html: string;
+  rawText: string;
+  paywalled: boolean;
 };

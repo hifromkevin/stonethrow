@@ -14,3 +14,19 @@ export type { Pebble, OtherPebbleGroup } from '@/types/pebble';
 export type { Star } from '@/types/star';
 export type { TooltipProps } from '@/types/tooltip';
 export type { TTextArea } from '@/types/textarea';
+export type {
+  Badge,
+  BadgeName,
+  BadgeCategory,
+  ContentScore,
+  ContentScoreMetrics,
+  ContentScoreLLMResponse,
+  FocusScore,
+  FocusScoreMetrics,
+  FocusScoreLLMResponse,
+  FocusBatchLLMResponse,
+  FocusStatement,
+  FocusSafetyResult,
+  RankedPebble,
+  RankedPebblesResponse,
+} from '@/types/scoring';
