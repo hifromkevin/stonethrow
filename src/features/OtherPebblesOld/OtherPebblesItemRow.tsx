@@ -37,7 +37,7 @@ const OtherPebblesItemRow = ({ pebble }: { pebble: Pebble }) => {
           <Tooltip content="This is where the AI response will appear">
             <CircleQuestionMark className="text-xs text-slate-500 hover:bg-slate-100" />
           </Tooltip>
-          <EllipsisIcon />
+          <EllipsisIcon url={pebble.canonical_url} onDelete={() => {}} pebbleId={pebble.id} />
         </div>
       </div>
     </div>
