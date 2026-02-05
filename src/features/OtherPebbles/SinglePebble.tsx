@@ -11,9 +11,11 @@ import cleanTitle from '@/lib/urls/cleanTitle';
 const SinglePebble = ({
   pebble,
   onDelete,
+  explanation,
 }: {
   pebble: Pebble;
   onDelete: (pebbleId: string) => void;
+  explanation?: string;
 }) => (
   <div className="relative odd:bg-white even:bg-slate-50/40 hover:bg-slate-50/50">
     <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-2">
@@ -38,7 +40,7 @@ const SinglePebble = ({
         </a>
       </div>
 
-      <Tooltip content="This is where the AI response will appear">
+      <Tooltip content={explanation ?? 'Scoring in progress...'}>
         <CircleQuestionMark className="text-xs text-slate-500 hover:bg-slate-100" />
       </Tooltip>
 
