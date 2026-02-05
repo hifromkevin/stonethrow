@@ -1,66 +1,52 @@
 import { Pebble } from '@/types';
 
+const mockPebble = (overrides: Partial<Pebble> & { id: string; title: string; canonical_url: string }): Pebble => ({
+  user_id: 'demo-user',
+  original_url: overrides.canonical_url,
+  domain: new URL(overrides.canonical_url).hostname,
+  group_name: 'Learning',
+  group_color: '#f90',
+  is_starred: false,
+  is_archived: false,
+  is_upvoted: false,
+  status: 'active',
+  ai_tags: [],
+  created_at: new Date().toISOString(),
+  ...overrides,
+});
+
 export const prioritizedPebbles: Pebble[] = [
-  {
+  mockPebble({
     id: 'p1',
-    user_id: 'demo-user',
     title: 'Pebble with Short Title',
-    url: 'https://short-title.com',
+    canonical_url: 'https://short-title.com',
     notes: 'Boosted with a focus star',
     group_name: 'Focus',
-    group_color: '#f90',
     is_starred: true,
-    is_archived: false,
-    created_at: new Date().toISOString(),
-  },
-  {
+  }),
+  mockPebble({
     id: 'p2',
-    user_id: 'demo-user',
     title: 'How to Build Focus Statement',
-    url: 'https://youtube.com/watch?v=123',
-    notes:
-      'This is foundational in learning how to [whatever focus statement says]',
-    group_name: 'Learning',
-    group_color: '#f90',
+    canonical_url: 'https://youtube.com/watch?v=123',
+    notes: 'This is foundational in learning how to [whatever focus statement says]',
     is_starred: true,
-    is_archived: false,
-    created_at: new Date().toISOString(),
-  },
-  {
+  }),
+  mockPebble({
     id: 'p3',
-    user_id: 'demo-user',
     title: 'Similar Subject that Helps Focus Statement',
-    url: 'https://youtube.com/watch?v=456',
+    canonical_url: 'https://youtube.com/watch?v=456',
     notes: 'This is a good follow up to (link #1)',
-    group_name: 'Learning',
-    group_color: '#f90',
-    is_starred: false,
-    is_archived: false,
-    created_at: new Date().toISOString(),
-  },
-  {
+  }),
+  mockPebble({
     id: 'p4',
-    user_id: 'demo-user',
     title: 'This is what a Hovered Link Looks Like',
-    url: 'https://youtube.com/watch?v=789',
+    canonical_url: 'https://youtube.com/watch?v=789',
     notes: 'After learning [this] and [that], this is a great next step',
-    group_name: 'Learning',
-    group_color: '#f90',
-    is_starred: false,
-    is_archived: false,
-    created_at: new Date().toISOString(),
-  },
-  {
+  }),
+  mockPebble({
     id: 'p5',
-    user_id: 'demo-user',
     title: 'How to Build Focus Statement',
-    url: 'https://youtube.com/watch?v=101',
-    notes:
-      'This is foundational in learning how to [whatever focus statement says]',
-    group_name: 'Learning',
-    group_color: '#f90',
-    is_starred: false,
-    is_archived: false,
-    created_at: new Date().toISOString(),
-  },
+    canonical_url: 'https://youtube.com/watch?v=101',
+    notes: 'This is foundational in learning how to [whatever focus statement says]',
+  }),
 ];
