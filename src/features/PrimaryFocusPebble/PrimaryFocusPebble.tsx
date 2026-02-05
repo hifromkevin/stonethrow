@@ -2,13 +2,30 @@ import LocalHeading from '@/components/layout/LocalHeading';
 import Button from '@/components/ui/Button';
 import cleanTitle from '@/lib/urls/cleanTitle';
 import { Pebble } from '@/types/pebble';
+import type { Badge } from '@/types/scoring';
+
+const BADGE_ICON: Record<string, string> = {
+  positive: '✓',
+  neutral: '•',
+  negative: '✗',
+};
+
+const BADGE_COLOR: Record<string, string> = {
+  positive: 'text-green-700',
+  neutral: 'text-slate-500',
+  negative: 'text-red-600',
+};
 
 const PrimaryFocusPebble = ({
   primaryFocusPebble,
   onDelete,
+  badges = [],
+  explanation,
 }: {
   primaryFocusPebble: Pebble;
   onDelete: (pebbleId: string) => void;
+  badges?: Badge[];
+  explanation?: string;
 }) => (
   <div className="mx-auto my-10 w-full max-w-2xl">
     <LocalHeading label="If you only do one thing today..." bigger />
@@ -52,25 +69,38 @@ const PrimaryFocusPebble = ({
           <p className="mb-3 font-medium text-gray-900">Why this matters</p>
           <div className="border-l-4 border-[var(--color-primary)]">
             <p className="mb-4 ml-2 text-sm text-gray-900">
-              This was selected as your primary focus because it aligns so
-              perfectly with your goals.
+              {explanation ??
+                'This was selected as your primary focus because it aligns with your goals.'}
             </p>
           </div>
 
-          <ul className="space-y-2 text-sm text-gray-600">
-            <li className="flex gap-2">
-              <span className="text-[var(--color-primary)]">✓</span>
-              Matches your goals
-            </li>
-            <li className="flex gap-2">
-              <span className="text-[var(--color-primary)]">✓</span>
-              Aligns with focus
-            </li>
-            <li className="flex gap-2">
-              <span className="text-[var(--color-primary)]">✓</span>
-              Highest ROI
-            </li>
-          </ul>
+          {badges.length > 0 ? (
+            <ul className="space-y-2 text-sm text-gray-600">
+              {badges.map((badge) => (
+                <li key={badge.name} className="flex gap-2">
+                  <span className={BADGE_COLOR[badge.category]}>
+                    {BADGE_ICON[badge.category]}
+                  </span>
+                  {badge.name}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <ul className="space-y-2 text-sm text-gray-600">
+              <li className="flex gap-2">
+                <span className="text-[var(--color-primary)]">✓</span>
+                Matches your goals
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[var(--color-primary)]">✓</span>
+                Aligns with focus
+              </li>
+              <li className="flex gap-2">
+                <span className="text-[var(--color-primary)]">✓</span>
+                Highest ROI
+              </li>
+            </ul>
+          )}
         </div>
       </div>
 
