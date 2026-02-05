@@ -30,6 +30,8 @@ export type Pebble = {
   last_interacted_at?: string;
   image_source?: 'og' | 'twitter' | 'youtube' | 'dom' | 'fallback';
   is_upvoted: boolean;
+  raw_text?: string;
+  paywalled?: boolean;
 };
 
 export type OtherPebbleGroup = {
