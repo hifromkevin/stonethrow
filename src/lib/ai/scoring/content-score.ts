@@ -15,33 +15,27 @@ const WEIGHTS = {
   effort_friction: 0.1,
 } as const;
 
-function clamp(value: number, min = 0, max = 1): number {
-  return Math.max(min, Math.min(max, value));
-}
+const clamp = (value: number, min = 0, max = 1): number =>
+  Math.max(min, Math.min(max, value));
 
-function computeWeightedScore(metrics: ContentScoreLLMResponse): number {
-  return (
-    WEIGHTS.actionability * metrics.actionability +
-    WEIGHTS.signal_to_noise * metrics.signal_to_noise +
-    WEIGHTS.time_to_value * metrics.time_to_value +
-    WEIGHTS.time_relevance * metrics.time_relevance +
-    WEIGHTS.effort_friction * metrics.effort_friction
-  );
-}
+const computeWeightedScore = (metrics: ContentScoreLLMResponse): number =>
+  WEIGHTS.actionability * metrics.actionability +
+  WEIGHTS.signal_to_noise * metrics.signal_to_noise +
+  WEIGHTS.time_to_value * metrics.time_to_value +
+  WEIGHTS.time_relevance * metrics.time_relevance +
+  WEIGHTS.effort_friction * metrics.effort_friction;
 
-function sanitizeMetrics(
+const sanitizeMetrics = (
   raw: ContentScoreLLMResponse
-): ContentScoreLLMResponse {
-  return {
-    actionability: clamp(raw.actionability),
-    signal_to_noise: clamp(raw.signal_to_noise),
-    time_to_value: clamp(raw.time_to_value),
-    time_relevance: clamp(raw.time_relevance),
-    effort_friction: clamp(raw.effort_friction),
-    confidence: clamp(raw.confidence),
-    evidence: raw.evidence ?? '',
-  };
-}
+): ContentScoreLLMResponse => ({
+  actionability: clamp(raw.actionability),
+  signal_to_noise: clamp(raw.signal_to_noise),
+  time_to_value: clamp(raw.time_to_value),
+  time_relevance: clamp(raw.time_relevance),
+  effort_friction: clamp(raw.effort_friction),
+  confidence: clamp(raw.confidence),
+  evidence: raw.evidence ?? '',
+});
 
 export async function scoreContent(pebble: {
   id: string;
