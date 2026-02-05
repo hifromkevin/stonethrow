@@ -1,6 +1,8 @@
 'use client';
 import { useState } from 'react';
 import usePebbles from '@/lib/queries/client/usePebbles';
+import useRankedPebbles from '@/lib/queries/client/useRankedPebbles';
+import useFocus from '@/lib/queries/useFocus';
 
 import CenteredComponent from '@/components/layout/CenteredComponent';
 import Header from '@/components/layout/Header';
@@ -24,13 +26,49 @@ const DashboardClient = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [focusStatus, setFocusStatus] = useState<FocusState>('empty');
 
+  const { data: focus } = useFocus();
+  const focusId = focus?.id;
+
+  // Use ranked pebbles when focus is active, flat list otherwise
   const {
-    data: pebbles = [],
-    isLoading: pebblesLoading,
-    error: pebblesError,
+    data: rankedData,
+    isLoading: rankedLoading,
+  } = useRankedPebbles(focusId);
+
+  const {
+    data: flatPebbles = [],
+    isLoading: flatLoading,
   } = usePebbles();
 
-  const hasPebbles = pebbles.length > 0;
+  const isLoading = focusId ? rankedLoading : flatLoading;
+
+  // Derive display data based on whether we have a focus
+  const primaryPebble = focusId
+    ? rankedData?.primary?.pebble ?? null
+    : flatPebbles[0] ?? null;
+
+  const primaryBadges = focusId ? rankedData?.primary?.badges ?? [] : [];
+  const primaryExplanation = focusId ? rankedData?.primary?.explanation : undefined;
+
+  const focusedPebblesList = focusId
+    ? (rankedData?.focused ?? []).map((r) => r.pebble)
+    : flatPebbles.slice(1);
+
+  const focusedBadgesMap = focusId
+    ? new Map((rankedData?.focused ?? []).map((r) => [r.pebble.id, { badges: r.badges, explanation: r.explanation }]))
+    : new Map();
+
+  const otherPebblesList = focusId
+    ? (rankedData?.other ?? []).map((r) => r.pebble)
+    : flatPebbles.slice(1);
+
+  const otherBadgesMap = focusId
+    ? new Map((rankedData?.other ?? []).map((r) => [r.pebble.id, { badges: r.badges, explanation: r.explanation }]))
+    : new Map();
+
+  const hasPebbles = focusId
+    ? !!(rankedData?.primary || (rankedData?.focused?.length ?? 0) > 0 || (rankedData?.other?.length ?? 0) > 0)
+    : flatPebbles.length > 0;
 
   const deletePebble = useDeletePebble();
   const onDelete = (pebbleId: string) => {
@@ -39,7 +77,6 @@ const DashboardClient = () => {
     deletePebble.mutate(pebbleId);
   };
 
-  console.log('himom!', pebbles);
   return (
     <>
       <main className="mt-18 mb-10 min-h-screen w-screen bg-white">
@@ -52,10 +89,9 @@ const DashboardClient = () => {
         </CenteredComponent>
 
         <CenteredComponent ariaLabel="polite">
-          {pebblesLoading && <div>Loading...</div>}
-          {pebblesError && <div>Failed to load pebbles</div>}
+          {isLoading && <div>Loading...</div>}
         </CenteredComponent>
-        {!hasPebbles && !pebblesLoading && (
+        {!hasPebbles && !isLoading && (
           <CenteredComponent ariaLabel="no-pebbles-state">
             <PebblesEmptyState
               hasFocus={focusStatus !== 'empty'}
@@ -65,30 +101,44 @@ const DashboardClient = () => {
         )}
         {hasPebbles && (
           <>
-            <CenteredComponent>
-              {/* <NarrowComponent adtlStyles="mb-4  max-w-4xl"> */}
-              <PrimaryFocusPebble
-                primaryFocusPebble={pebbles[0]}
-                onDelete={onDelete}
-              />
-              {/* </NarrowComponent> */}
-            </CenteredComponent>
-            <CenteredComponent ariaLabel="focused-pebbles">
-              <NarrowComponent>
-                <LocalHeading label="On Your Radar" />
-              </NarrowComponent>
-            </CenteredComponent>
+            {primaryPebble && (
+              <CenteredComponent>
+                <PrimaryFocusPebble
+                  primaryFocusPebble={primaryPebble}
+                  onDelete={onDelete}
+                  badges={primaryBadges}
+                  explanation={primaryExplanation}
+                />
+              </CenteredComponent>
+            )}
 
-            <CenteredComponent ariaLabel="focused-pebbles-list">
-              <FocusedPebbles
-                savedPebbles={pebbles.slice(1)}
-                onDelete={onDelete}
-              />
-            </CenteredComponent>
+            {focusedPebblesList.length > 0 && (
+              <>
+                <CenteredComponent ariaLabel="focused-pebbles">
+                  <NarrowComponent>
+                    <LocalHeading label="On Your Radar" />
+                  </NarrowComponent>
+                </CenteredComponent>
 
-            <CenteredComponent ariaLabel="other-pebbles">
-              <OtherPebbles pebbles={pebbles.slice(1)} onDelete={onDelete} />
-            </CenteredComponent>
+                <CenteredComponent ariaLabel="focused-pebbles-list">
+                  <FocusedPebbles
+                    savedPebbles={focusedPebblesList}
+                    onDelete={onDelete}
+                    badgesMap={focusedBadgesMap}
+                  />
+                </CenteredComponent>
+              </>
+            )}
+
+            {otherPebblesList.length > 0 && (
+              <CenteredComponent ariaLabel="other-pebbles">
+                <OtherPebbles
+                  pebbles={otherPebblesList}
+                  onDelete={onDelete}
+                  badgesMap={otherBadgesMap}
+                />
+              </CenteredComponent>
+            )}
           </>
         )}
         <div className="fixed right-6 bottom-6 xl:right-[calc(40%-40rem/2)]">
