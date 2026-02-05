@@ -1,4 +1,5 @@
 import { HtmlMetadata } from '@/types';
+import extractRawText from '@/lib/urls/extractRawText';
 
 const extractHtmlMetadata = async (
   url: string
@@ -95,12 +96,16 @@ const extractHtmlMetadata = async (
         return null;
       }
     };
+    const { rawText, paywalled } = extractRawText(html);
+
     return {
       title,
       description,
       image: resolveUrl(image, url),
       imageSource,
       html,
+      rawText,
+      paywalled,
     };
   } catch (err) {
     console.warn('❌ extractHtmlMetadata error:', err);
