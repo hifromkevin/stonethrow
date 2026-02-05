@@ -27,6 +27,8 @@ const addPebble = async (
       image_url: meta?.image,
       image_source: meta?.imageSource,
       description: meta?.description,
+      raw_text: meta?.rawText ?? null,
+      paywalled: meta?.paywalled ?? false,
     })
     .select()
     .single();
