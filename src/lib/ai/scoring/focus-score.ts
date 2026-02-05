@@ -16,14 +16,13 @@ const MAX_BATCH_SIZE = 50;
 // MVP: assume general beginner-to-intermediate user
 const USER_CAPABILITY_ESTIMATE = 0.5;
 
-function clamp(value: number, min = 0, max = 1): number {
-  return Math.max(min, Math.min(max, value));
-}
+const clamp = (value: number, min = 0, max = 1): number =>
+  Math.max(min, Math.min(max, value));
 
-function computeFocusScore(
+const computeFocusScore = (
   raw: FocusScoreLLMResponse,
   contentScore: number
-): FocusScore {
+): FocusScore => {
   const focus_relevance = clamp(raw.focus_relevance);
   const momentum = clamp(raw.momentum);
   const contextual_readiness = clamp(raw.contextual_readiness);
@@ -46,8 +45,7 @@ function computeFocusScore(
     0.2 * contextual_readiness_adjusted;
 
   // FinalScore on 0-100 scale
-  const final_score =
-    (0.45 * contentScore + 0.55 * relevance_score) * 100;
+  const final_score = (0.45 * contentScore + 0.55 * relevance_score) * 100;
 
   return {
     focus_relevance,
@@ -65,7 +63,7 @@ function computeFocusScore(
     confidence: clamp(raw.confidence),
     evidence: raw.evidence ?? '',
   };
-}
+};
 
 type PebbleInput = {
   id: string;
@@ -112,11 +110,11 @@ async function persistFocusScores(
   }
 }
 
-function processLLMScores(
+const processLLMScores = (
   llmResponse: FocusBatchLLMResponse,
   pebbleInputs: PebbleInput[],
   focusId: string
-): Array<FocusScore & { pebble_id: string; focus_id: string }> {
+): Array<FocusScore & { pebble_id: string; focus_id: string }> => {
   const focusScores: Array<
     FocusScore & { pebble_id: string; focus_id: string }
   > = [];
@@ -154,7 +152,7 @@ function processLLMScores(
   }
 
   return focusScores;
-}
+};
 
 /**
  * Score all of a user's active pebbles against a focus statement in a single batch LLM call.
@@ -242,11 +240,7 @@ export async function scoreFocusSingle(
     maxTokens: 1024,
   });
 
-  const focusScores = processLLMScores(
-    llmResponse,
-    [pebbleInput],
-    focusId
-  );
+  const focusScores = processLLMScores(llmResponse, [pebbleInput], focusId);
 
   // For a single pebble, we need to check existing scores to assign bucket correctly
   // The single pebble defaults to 'primary' from processLLMScores since it's the only one
