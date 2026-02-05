@@ -1,9 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import Sidebar from '@/components/ui/Sidebar';
 import TextArea from '@/components/ui/TextArea';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
@@ -11,18 +10,65 @@ import LocalHeading from '@/components/layout/LocalHeading';
 
 import { CircleQuestionMark } from 'lucide-react';
 
+import useFocus from '@/lib/queries/useFocus';
+import useSetFocus from '@/lib/mutations/useSetFocus';
+
+import type { FocusState } from '@/types/focusCard';
+
 const FocusCard = ({
   focusStatus,
   setFocusStatus,
 }: {
-  focusStatus: string;
-  setFocusStatus: Function;
+  focusStatus: FocusState;
+  setFocusStatus: (status: FocusState) => void;
 }) => {
   const [focusText, setFocusText] = useState('');
   const [focusDraft, setFocusDraft] = useState('');
+  const [safetyError, setSafetyError] = useState<{
+    reason: string;
+    alternatives: string[];
+  } | null>(null);
+
+  const { data: persistedFocus } = useFocus();
+  const setFocusMutation = useSetFocus();
+
+  // Sync persisted focus into local state on load
+  useEffect(() => {
+    if (persistedFocus?.statement) {
+      setFocusText(persistedFocus.statement);
+      setFocusStatus('committed');
+    }
+  }, [persistedFocus, setFocusStatus]);
+
   const isEditing = focusStatus === 'editing';
   const isCommitted = focusStatus === 'committed';
   const isEmpty = focusStatus === 'empty';
+
+  const handleSave = async () => {
+    if (!focusDraft.trim()) {
+      setFocusText('');
+      setFocusStatus('empty');
+      return;
+    }
+
+    setSafetyError(null);
+    const result = await setFocusMutation.mutateAsync(focusDraft.trim());
+
+    if (result.ok) {
+      setFocusText(focusDraft.trim());
+      setFocusStatus('committed');
+    } else if (result.error === 'UNSAFE_FOCUS') {
+      setSafetyError({
+        reason: result.rejection_reason ?? 'Focus rejected.',
+        alternatives: result.alternatives ?? [],
+      });
+    }
+  };
+
+  const handleAlternativeClick = (alt: string) => {
+    setFocusDraft(alt);
+    setSafetyError(null);
+  };
 
   return (
     <div
@@ -51,6 +97,7 @@ const FocusCard = ({
             if (focusStatus !== 'editing') {
               setFocusDraft(focusText);
               setFocusStatus('editing');
+              setSafetyError(null);
             }
           }}
         >
@@ -89,6 +136,33 @@ const FocusCard = ({
                 perfection
               </p>
 
+              {safetyError && (
+                <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3">
+                  <p className="text-sm font-medium text-red-700">
+                    {safetyError.reason}
+                  </p>
+                  {safetyError.alternatives.length > 0 && (
+                    <div className="mt-2">
+                      <p className="text-xs text-red-600">Try one of these instead:</p>
+                      <div className="mt-1 flex flex-wrap gap-2">
+                        {safetyError.alternatives.map((alt) => (
+                          <button
+                            key={alt}
+                            className="rounded-full bg-white px-3 py-1 text-xs text-slate-700 shadow-sm hover:bg-slate-50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAlternativeClick(alt);
+                            }}
+                          >
+                            {alt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <footer className="mt-6 flex items-center justify-center gap-4">
                 <button
                   className="text-slate-500 hover:text-slate-700"
@@ -101,18 +175,10 @@ const FocusCard = ({
                   Cancel
                 </button>
                 <Button
-                  label="Save Focus"
+                  label={setFocusMutation.isPending ? 'Saving...' : 'Save Focus'}
                   type="button"
                   overrides="w-28"
-                  clickFn={() => {
-                    if (!focusDraft.trim()) {
-                      setFocusText('');
-                      setFocusStatus('empty');
-                    } else {
-                      setFocusText(focusDraft);
-                      setFocusStatus('committed');
-                    }
-                  }}
+                  clickFn={handleSave}
                 />
               </footer>
             </div>

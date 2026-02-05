@@ -5,20 +5,26 @@ import EllipsisIcon from '@/components/ui/Ellipsis/EllipsisIcon';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
 import { Pebble } from '@/types';
+import type { Badge } from '@/types/scoring';
 
 import cleanTitle from '@/lib/urls/cleanTitle';
 
-import useDeletePebble from '@/lib/mutations/useDeletePebble';
-
-const stripProtocol = (url: string) =>
-  url ? url.replace(/^[a-zA-Z]+:\/\//, '').replace(/^www\./, '') : null;
+const BADGE_COLOR: Record<string, string> = {
+  positive: 'text-green-700',
+  neutral: 'text-slate-500',
+  negative: 'text-red-600',
+};
 
 const FocusedPebbleRow = ({
   pebble,
   onDelete,
+  badges = [],
+  explanation,
 }: {
   pebble: Pebble;
   onDelete: (pebbleId: string) => void;
+  badges?: Badge[];
+  explanation?: string;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isStarSelected, setIsStarSelected] = useState(pebble.is_starred);
@@ -63,18 +69,21 @@ const FocusedPebbleRow = ({
             >
               ({pebble.domain ? pebble.domain : pebble.canonical_url})
             </a>
-            <div className="mt-2 flex flex-wrap gap-2">
-              <div className="flex flex-wrap items-start gap-2 text-xs text-slate-600">
-                <span>High ROI</span>
-                <span className="text-slate-300">•</span>
-                <span>Aligns with focus</span>
-                <span className="text-slate-300">•</span>
-                <span>Go here</span>
+            {badges.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-2">
+                <div className="flex flex-wrap items-start gap-2 text-xs">
+                  {badges.map((badge, i) => (
+                    <span key={badge.name}>
+                      {i > 0 && <span className="mr-2 text-slate-300">•</span>}
+                      <span className={BADGE_COLOR[badge.category]}>{badge.name}</span>
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          <Tooltip content="This is where the AI response will appear">
+          <Tooltip content={explanation ?? 'Scoring in progress...'}>
             <CircleQuestionMark className="text-xs text-slate-500 hover:bg-slate-100" />
           </Tooltip>
         </div>
