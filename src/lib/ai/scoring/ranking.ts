@@ -5,6 +5,7 @@ import type {
   RankedPebble,
   RankedPebblesResponse,
   FocusStatement,
+  ScoringStatus,
 } from '@/types';
 
 export async function getRankedPebbles(
@@ -44,15 +45,21 @@ export async function getRankedPebbles(
     `
     )
     .eq('user_id', userId)
-    .eq('status', 'active')
     .order('created_at', { ascending: false });
 
   if (error || !pebbles) {
     console.error('Failed to fetch pebbles for ranking:', error);
-    return { focus, primary: null, focused: [], other: [] };
+    return {
+      focus,
+      primary: null,
+      focused: [],
+      other: [],
+      scoringStatus: { isScoring: false, scoredCount: 0, totalCount: 0 },
+    };
   }
 
-  // Build ranked pebbles
+  // Build ranked pebbles and track scoring status
+  let scoredCount = 0;
   const rankedPebbles: RankedPebble[] = pebbles.map((p: any) => {
     const contentScore = p.pebble_content_scores?.[0] ?? null;
     const focusScore = focus
@@ -60,6 +67,8 @@ export async function getRankedPebbles(
           (fs: any) => fs.focus_id === focus!.id
         ) ?? null
       : null;
+
+    if (focusScore) scoredCount++;
 
     return {
       pebble: p as Pebble,
@@ -74,6 +83,10 @@ export async function getRankedPebbles(
     };
   });
 
+  const totalCount = pebbles.length;
+  const isScoring = focus !== null && scoredCount < totalCount;
+  const scoringStatus: ScoringStatus = { isScoring, scoredCount, totalCount };
+
   // Sort by final_score descending
   rankedPebbles.sort((a, b) => b.final_score - a.final_score);
 
@@ -87,6 +100,7 @@ export async function getRankedPebbles(
           : null,
       focused: [],
       other: rankedPebbles.slice(1),
+      scoringStatus: { isScoring: false, scoredCount: totalCount, totalCount },
     };
   }
 
@@ -108,5 +122,6 @@ export async function getRankedPebbles(
     primary: primary ? { ...primary, bucket: 'primary' } : null,
     focused,
     other,
+    scoringStatus,
   };
 }

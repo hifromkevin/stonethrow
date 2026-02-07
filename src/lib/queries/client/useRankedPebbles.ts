@@ -18,9 +18,10 @@ const useRankedPebbles = (focusId?: string) => {
     queryFn: () => fetchRankedPebbles(focusId),
     enabled: !!focusId,
     refetchInterval: (query) => {
-      // Poll every 3s while waiting for focus scores to be computed
+      // Poll every 3s while scoring is in progress
       const data = query.state.data;
-      if (data?.primary?.focus_score) return false;
+      // Stop polling when all pebbles have been scored
+      if (data?.scoringStatus && !data.scoringStatus.isScoring) return false;
       return 3000;
     },
   });

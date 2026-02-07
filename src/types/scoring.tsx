@@ -118,10 +118,18 @@ export type RankedPebble = {
   explanation?: string;
 };
 
+// Scoring status for UI feedback
+export type ScoringStatus = {
+  isScoring: boolean;
+  scoredCount: number;
+  totalCount: number;
+};
+
 // API response for ranked pebbles
 export type RankedPebblesResponse = {
   focus: FocusStatement | null;
   primary: RankedPebble | null;
   focused: RankedPebble[];
   other: RankedPebble[];
+  scoringStatus: ScoringStatus;
 };

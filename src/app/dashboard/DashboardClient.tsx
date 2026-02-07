@@ -11,6 +11,7 @@ import NarrowComponent from '@/components/layout/NarrowComponent';
 
 import AddPebbleIcon from '@/features/AddPebbleIcon/AddPebbleIcon';
 import FocusCard from '@/features/FocusCard/FocusCard';
+import ScoringStatus from '@/features/ScoringStatus/ScoringStatus';
 
 import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
 import LocalHeading from '@/components/layout/LocalHeading';
@@ -70,6 +71,8 @@ const DashboardClient = () => {
     ? !!(rankedData?.primary || (rankedData?.focused?.length ?? 0) > 0 || (rankedData?.other?.length ?? 0) > 0)
     : flatPebbles.length > 0;
 
+  const isScoring = rankedData?.scoringStatus?.isScoring ?? false;
+
   const deletePebble = useDeletePebble();
   const onDelete = (pebbleId: string) => {
     if (!confirm('Remove this Pebble?')) return;
@@ -88,9 +91,16 @@ const DashboardClient = () => {
           />
         </CenteredComponent>
 
+        {isScoring && (
+          <CenteredComponent ariaLabel="scoring-status">
+            <ScoringStatus scoringStatus={rankedData!.scoringStatus} />
+          </CenteredComponent>
+        )}
+
         <CenteredComponent ariaLabel="polite">
           {isLoading && <div>Loading...</div>}
         </CenteredComponent>
+
         {!hasPebbles && !isLoading && (
           <CenteredComponent ariaLabel="no-pebbles-state">
             <PebblesEmptyState
@@ -99,48 +109,51 @@ const DashboardClient = () => {
             />
           </CenteredComponent>
         )}
-        {hasPebbles && (
-          <>
-            {primaryPebble && (
-              <CenteredComponent>
-                <PrimaryFocusPebble
-                  primaryFocusPebble={primaryPebble}
-                  onDelete={onDelete}
-                  badges={primaryBadges}
-                  explanation={primaryExplanation}
-                />
-              </CenteredComponent>
-            )}
 
-            {focusedPebblesList.length > 0 && (
-              <>
-                <CenteredComponent ariaLabel="focused-pebbles">
-                  <NarrowComponent>
-                    <LocalHeading label="On Your Radar" />
-                  </NarrowComponent>
-                </CenteredComponent>
-
-                <CenteredComponent ariaLabel="focused-pebbles-list">
-                  <FocusedPebbles
-                    savedPebbles={focusedPebblesList}
+        <div className={isScoring ? 'opacity-50 transition-opacity duration-300' : 'transition-opacity duration-300'}>
+          {hasPebbles && (
+            <>
+              {primaryPebble && (
+                <CenteredComponent>
+                  <PrimaryFocusPebble
+                    primaryFocusPebble={primaryPebble}
                     onDelete={onDelete}
-                    badgesMap={focusedBadgesMap}
+                    badges={primaryBadges}
+                    explanation={primaryExplanation}
                   />
                 </CenteredComponent>
-              </>
-            )}
+              )}
 
-            {otherPebblesList.length > 0 && (
-              <CenteredComponent ariaLabel="other-pebbles">
-                <OtherPebbles
-                  pebbles={otherPebblesList}
-                  onDelete={onDelete}
-                  badgesMap={otherBadgesMap}
-                />
-              </CenteredComponent>
-            )}
-          </>
-        )}
+              {focusedPebblesList.length > 0 && (
+                <>
+                  <CenteredComponent ariaLabel="focused-pebbles">
+                    <NarrowComponent>
+                      <LocalHeading label="On Your Radar" />
+                    </NarrowComponent>
+                  </CenteredComponent>
+
+                  <CenteredComponent ariaLabel="focused-pebbles-list">
+                    <FocusedPebbles
+                      savedPebbles={focusedPebblesList}
+                      onDelete={onDelete}
+                      badgesMap={focusedBadgesMap}
+                    />
+                  </CenteredComponent>
+                </>
+              )}
+
+              {otherPebblesList.length > 0 && (
+                <CenteredComponent ariaLabel="other-pebbles">
+                  <OtherPebbles
+                    pebbles={otherPebblesList}
+                    onDelete={onDelete}
+                    badgesMap={otherBadgesMap}
+                  />
+                </CenteredComponent>
+              )}
+            </>
+          )}
+        </div>
         <div className="fixed right-6 bottom-6 xl:right-[calc(40%-40rem/2)]">
           <AddPebbleIcon handleClick={() => setIsModalOpen(true)} />
         </div>

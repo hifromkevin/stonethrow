@@ -11,7 +11,7 @@ import type {
   FocusScore,
 } from '@/types/scoring';
 
-const MAX_BATCH_SIZE = 50;
+const MAX_BATCH_SIZE = 20;
 
 // MVP: assume general beginner-to-intermediate user
 const USER_CAPABILITY_ESTIMATE = 0.5;
@@ -155,7 +155,7 @@ const processLLMScores = (
 };
 
 /**
- * Score all of a user's active pebbles against a focus statement in a single batch LLM call.
+ * Score all of a user's pebbles against a focus statement in batches.
  */
 export async function scoreFocusBatch(
   userId: string,
@@ -164,7 +164,7 @@ export async function scoreFocusBatch(
 ): Promise<void> {
   const supabase = await createClient();
 
-  // Fetch active pebbles with their content scores
+  // Fetch ALL pebbles with their content scores (no limit)
   const { data: pebbles, error: fetchError } = await supabase
     .from('pebbles')
     .select(
@@ -174,12 +174,14 @@ export async function scoreFocusBatch(
     `
     )
     .eq('user_id', userId)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false })
-    .limit(MAX_BATCH_SIZE);
+    .order('created_at', { ascending: false });
 
-  if (fetchError || !pebbles?.length) {
-    console.warn('No pebbles to score or fetch error:', fetchError);
+  if (fetchError) {
+    console.error('📦 scoreFocusBatch: fetch error:', fetchError);
+    return;
+  }
+  if (!pebbles?.length) {
+    console.warn('No pebbles to score');
     return;
   }
 
@@ -193,15 +195,101 @@ export async function scoreFocusBatch(
     content_score: p.pebble_content_scores?.[0]?.content_score ?? 0.5,
   }));
 
-  const llmResponse = await callLLM<FocusBatchLLMResponse>({
-    model: MODELS.FOCUS_SCORE,
-    systemPrompt: FOCUS_SCORE_SYSTEM_PROMPT,
-    userPrompt: buildFocusScoreUserPrompt(focusStatement, pebbleInputs),
-    maxTokens: 4096,
-  });
+  // Split into batches
+  const batches: PebbleInput[][] = [];
+  for (let i = 0; i < pebbleInputs.length; i += MAX_BATCH_SIZE) {
+    batches.push(pebbleInputs.slice(i, i + MAX_BATCH_SIZE));
+  }
 
-  const focusScores = processLLMScores(llmResponse, pebbleInputs, focusId);
-  await persistFocusScores(focusScores);
+  console.log(`📦 Scoring ${pebbleInputs.length} pebbles in ${batches.length} batch(es) (parallel)`);
+
+  // Process all batches in parallel
+  const batchResults = await Promise.all(
+    batches.map(async (batch, index) => {
+      console.log(`🤖 Starting batch ${index + 1}/${batches.length} (${batch.length} pebbles)`);
+
+      try {
+        const llmResponse = await callLLM<FocusBatchLLMResponse>({
+          model: MODELS.FOCUS_SCORE,
+          systemPrompt: FOCUS_SCORE_SYSTEM_PROMPT,
+          userPrompt: buildFocusScoreUserPrompt(focusStatement, batch),
+          maxTokens: 8192,
+        });
+
+        // Process scores for this batch (without bucket assignment yet)
+        const batchScores: Array<FocusScore & { pebble_id: string; focus_id: string }> = [];
+        const scoredPebbleIds = new Set<string>();
+
+        for (const rawScore of llmResponse.scores) {
+          const pebbleInput = batch.find((p) => p.id === rawScore.pebble_id);
+          if (!pebbleInput) {
+            console.warn('LLM returned score for unknown pebble:', rawScore.pebble_id);
+            continue;
+          }
+
+          scoredPebbleIds.add(rawScore.pebble_id);
+          const computed = computeFocusScore(rawScore, pebbleInput.content_score ?? 0.5);
+          batchScores.push({
+            ...computed,
+            pebble_id: rawScore.pebble_id,
+            focus_id: focusId,
+          });
+        }
+
+        // Handle pebbles that LLM skipped - assign default scores
+        const skippedPebbles = batch.filter((p) => !scoredPebbleIds.has(p.id));
+        if (skippedPebbles.length > 0) {
+          console.warn(`⚠️ Batch ${index + 1}: LLM skipped ${skippedPebbles.length} pebble(s), assigning defaults`);
+          for (const pebble of skippedPebbles) {
+            const defaultScore: FocusScore & { pebble_id: string; focus_id: string } = {
+              focus_relevance: 0.3,
+              momentum: 0.3,
+              contextual_readiness: 0.3,
+              difficulty_estimate: 0.5,
+              difficulty_fit: 1 - Math.abs(0.5 - USER_CAPABILITY_ESTIMATE),
+              momentum_adjusted: 0.3,
+              contextual_readiness_adjusted: 0.3,
+              relevance_score: 0.3,
+              final_score: (0.45 * (pebble.content_score ?? 0.5) + 0.55 * 0.3) * 100,
+              badges: [],
+              explanation: 'Unable to fully analyze this pebble. It may need more context.',
+              bucket: 'other',
+              confidence: 0.3,
+              evidence: '',
+              pebble_id: pebble.id,
+              focus_id: focusId,
+            };
+            batchScores.push(defaultScore);
+          }
+        }
+
+        console.log(`✅ Batch ${index + 1} completed (${llmResponse.scores.length} scores, ${skippedPebbles.length} defaults)`);
+        return batchScores;
+      } catch (error) {
+        console.error(`❌ Batch ${index + 1} failed:`, error);
+        return []; // Return empty array, don't fail entire operation
+      }
+    })
+  );
+
+  // Flatten all batch results into single array
+  const allFocusScores = batchResults.flat();
+
+  // Assign buckets across ALL scores: top 1 = primary, >= 70 = focused, rest = other
+  if (allFocusScores.length > 0) {
+    allFocusScores.sort((a, b) => b.final_score - a.final_score);
+    allFocusScores[0].bucket = 'primary';
+
+    for (let i = 1; i < allFocusScores.length; i++) {
+      allFocusScores[i].bucket =
+        allFocusScores[i].final_score >= 70 ? 'focused' : 'other';
+    }
+  }
+
+  // Persist all scores
+  console.log(`💾 Persisting ${allFocusScores.length} focus scores`);
+  await persistFocusScores(allFocusScores);
+  console.log(`🎉 Finished scoring all ${allFocusScores.length} pebbles`);
 }
 
 /**

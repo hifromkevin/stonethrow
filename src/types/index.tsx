@@ -29,4 +29,5 @@ export type {
   FocusSafetyResult,
   RankedPebble,
   RankedPebblesResponse,
+  ScoringStatus,
 } from '@/types/scoring';

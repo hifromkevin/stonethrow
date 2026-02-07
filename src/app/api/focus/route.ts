@@ -73,11 +73,14 @@ export async function POST(req: Request) {
   }
 
   // Step 4: Kick off Stage B scoring in background
+  console.log('🎯 Focus saved, kicking off scoring for:', focus.id);
   after(async () => {
+    console.log('🚀 after() callback started for focus:', focus.id);
     try {
       await scoreFocusBatch(user.id, focus.id, focus.statement);
+      console.log('✅ scoreFocusBatch completed for focus:', focus.id);
     } catch (err) {
-      console.error('Stage B scoring failed for focus:', focus.id, err);
+      console.error('❌ Stage B scoring failed for focus:', focus.id, err);
     }
   });
 
