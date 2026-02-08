@@ -1,5 +1,6 @@
 import { NextResponse, after } from 'next/server';
 import createClient from '@/lib/supabase/server';
+import { AIError } from '@/lib/ai/errors';
 import { validateFocusSafety } from '@/lib/ai/safety/focus-validator';
 import { scoreFocusBatch } from '@/lib/ai/scoring/focus-score';
 import { MODELS } from '@/lib/ai/client';
@@ -80,7 +81,13 @@ export async function POST(req: Request) {
       await scoreFocusBatch(user.id, focus.id, focus.statement);
       console.log('✅ scoreFocusBatch completed for focus:', focus.id);
     } catch (err) {
-      console.error('❌ Stage B scoring failed for focus:', focus.id, err);
+      if (err instanceof AIError) {
+        console.error(
+          `❌ Stage B scoring failed for focus: ${focus.id} [${err.code}] ${err.message}`
+        );
+      } else {
+        console.error('❌ Stage B scoring failed for focus:', focus.id, err);
+      }
     }
   });
 

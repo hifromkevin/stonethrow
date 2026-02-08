@@ -1,4 +1,5 @@
 import anthropic, { type ModelVersion } from '@/lib/ai/client';
+import { AIError, classifyAIError } from '@/lib/ai/errors';
 import { parseLLMJSON } from '@/lib/ai/parseJSON';
 
 type CallLLMOptions = {
@@ -18,7 +19,7 @@ export async function callLLM<T>(options: CallLLMOptions): Promise<T> {
     maxRetries = 2,
   } = options;
 
-  let lastError: Error | null = null;
+  let lastError: AIError | null = null;
 
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
@@ -36,14 +37,26 @@ export async function callLLM<T>(options: CallLLMOptions): Promise<T> {
 
       return parseLLMJSON<T>(text);
     } catch (err) {
-      lastError = err instanceof Error ? err : new Error(String(err));
-      console.warn(`LLM call attempt ${attempt + 1} failed:`, lastError.message);
+      const aiError = classifyAIError(err);
+      lastError = aiError;
+
+      // Don't retry non-retryable errors (billing, auth, invalid requests)
+      if (!aiError.retryable) {
+        console.error(`LLM call failed (non-retryable): [${aiError.code}] ${aiError.message}`);
+        throw aiError;
+      }
+
+      console.warn(
+        `LLM call attempt ${attempt + 1}/${maxRetries + 1} failed (retryable): [${aiError.code}] ${aiError.message}`
+      );
 
       if (attempt < maxRetries) {
-        await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+        // Exponential backoff: 1s, 2s, 4s...
+        const delay = 1000 * Math.pow(2, attempt);
+        await new Promise((r) => setTimeout(r, delay));
       }
     }
   }
 
-  throw lastError ?? new Error('LLM call failed after all retries');
+  throw lastError ?? new AIError('LLM call failed after all retries', 'UNKNOWN_ERROR');
 }

@@ -1,5 +1,6 @@
 import { callLLM } from '@/lib/ai/callLLM';
 import { MODELS } from '@/lib/ai/client';
+import { AIError } from '@/lib/ai/errors';
 import {
   FOCUS_SCORE_SYSTEM_PROMPT,
   buildFocusScoreUserPrompt,
@@ -203,9 +204,18 @@ export async function scoreFocusBatch(
 
   console.log(`📦 Scoring ${pebbleInputs.length} pebbles in ${batches.length} batch(es) (parallel)`);
 
+  // Track if we hit a non-retryable error that should stop all processing
+  let criticalError: AIError | null = null;
+
   // Process all batches in parallel
   const batchResults = await Promise.all(
     batches.map(async (batch, index) => {
+      // Skip if another batch hit a critical error
+      if (criticalError) {
+        console.warn(`⏭️ Skipping batch ${index + 1} due to critical error`);
+        return [];
+      }
+
       console.log(`🤖 Starting batch ${index + 1}/${batches.length} (${batch.length} pebbles)`);
 
       try {
@@ -266,11 +276,27 @@ export async function scoreFocusBatch(
         console.log(`✅ Batch ${index + 1} completed (${llmResponse.scores.length} scores, ${skippedPebbles.length} defaults)`);
         return batchScores;
       } catch (error) {
-        console.error(`❌ Batch ${index + 1} failed:`, error);
-        return []; // Return empty array, don't fail entire operation
+        // Handle AIError with proper classification
+        if (error instanceof AIError) {
+          console.error(`❌ Batch ${index + 1} failed: [${error.code}] ${error.message}`);
+
+          // Stop all batches on non-retryable errors (billing, auth, etc.)
+          if (!error.retryable) {
+            criticalError = error;
+            console.error(`🛑 Critical error - stopping all batches: ${error.code}`);
+          }
+        } else {
+          console.error(`❌ Batch ${index + 1} failed:`, error);
+        }
+        return [];
       }
     })
   );
+
+  // If we hit a critical error, throw it so the caller knows
+  if (criticalError) {
+    throw criticalError;
+  }
 
   // Flatten all batch results into single array
   const allFocusScores = batchResults.flat();
