@@ -34,7 +34,6 @@ export async function getRankedPebbles(
     focus = data;
   }
 
-  // Fetch pebbles with scores
   const { data: pebbles, error } = await supabase
     .from('pebbles')
     .select(
@@ -58,14 +57,12 @@ export async function getRankedPebbles(
     };
   }
 
-  // Build ranked pebbles and track scoring status
   let scoredCount = 0;
   const rankedPebbles: RankedPebble[] = pebbles.map((p: any) => {
     const contentScore = p.pebble_content_scores?.[0] ?? null;
     const focusScore = focus
-      ? p.pebble_focus_scores?.find(
-          (fs: any) => fs.focus_id === focus!.id
-        ) ?? null
+      ? (p.pebble_focus_scores?.find((fs: any) => fs.focus_id === focus!.id) ??
+        null)
       : null;
 
     if (focusScore) scoredCount++;
@@ -75,22 +72,27 @@ export async function getRankedPebbles(
       content_score: contentScore,
       focus_score: focusScore,
       final_score:
-        focusScore?.final_score ??
-        (contentScore?.content_score ?? 0.5) * 100,
-      bucket: (focusScore?.bucket as 'primary' | 'focused' | 'other') ?? 'other',
+        focusScore?.final_score ?? (contentScore?.content_score ?? 0.5) * 100,
+      bucket:
+        (focusScore?.bucket as 'primary' | 'focused' | 'other') ?? 'other',
       badges: toBadges(focusScore?.badges ?? []),
       explanation: focusScore?.explanation ?? undefined,
     };
   });
 
   const totalCount = pebbles.length;
-  const isScoring = focus !== null && scoredCount < totalCount;
+
+  const SCORING_TIMEOUT_MS = 5 * 60 * 1000;
+  const focusAge = focus
+    ? Date.now() - new Date(focus.created_at).getTime()
+    : 0;
+  const scoringStuck = scoredCount === 0 && focusAge > SCORING_TIMEOUT_MS;
+
+  const isScoring = focus !== null && scoredCount < totalCount && !scoringStuck;
   const scoringStatus: ScoringStatus = { isScoring, scoredCount, totalCount };
 
-  // Sort by final_score descending
   rankedPebbles.sort((a, b) => b.final_score - a.final_score);
 
-  // When no focus, just put the top pebble as primary and everything else as other
   if (!focus) {
     return {
       focus: null,
@@ -104,7 +106,6 @@ export async function getRankedPebbles(
     };
   }
 
-  // Partition into buckets based on stored bucket assignments
   const primary =
     rankedPebbles.find((r) => r.bucket === 'primary') ??
     (rankedPebbles.length > 0 ? rankedPebbles[0] : null);
