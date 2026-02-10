@@ -74,33 +74,16 @@ const PrimaryFocusPebble = ({
             </p>
           </div>
 
-          {badges.length > 0 ? (
-            <ul className="space-y-2 text-sm text-gray-600">
-              {badges.map((badge) => (
-                <li key={badge.name} className="flex gap-2">
-                  <span className={BADGE_COLOR[badge.category]}>
-                    {BADGE_ICON[badge.category]}
-                  </span>
-                  {badge.name}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex gap-2">
-                <span className="text-[var(--color-primary)]">✓</span>
-                Matches your goals
+          <ul className="space-y-2 text-sm text-gray-600">
+            {badges.map((badge) => (
+              <li key={badge.name} className="flex gap-2">
+                <span className={BADGE_COLOR[badge.category]}>
+                  {BADGE_ICON[badge.category]}
+                </span>
+                {badge.name}
               </li>
-              <li className="flex gap-2">
-                <span className="text-[var(--color-primary)]">✓</span>
-                Aligns with focus
-              </li>
-              <li className="flex gap-2">
-                <span className="text-[var(--color-primary)]">✓</span>
-                Highest ROI
-              </li>
-            </ul>
-          )}
+            ))}
+          </ul>
         </div>
       </div>
 
