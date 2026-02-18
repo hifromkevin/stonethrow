@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import usePebbles from '@/lib/queries/client/usePebbles';
 import useRankedPebbles from '@/lib/queries/client/useRankedPebbles';
 import useFocus from '@/lib/queries/useFocus';
@@ -10,6 +10,7 @@ import AddPebbleModal from '@/components/layout/AddPebbleModal';
 import NarrowComponent from '@/components/layout/NarrowComponent';
 
 import AddPebbleIcon from '@/features/AddPebbleIcon/AddPebbleIcon';
+import CoachHint from '@/features/CoachHint/CoachHint';
 import FocusCard from '@/features/FocusCard/FocusCard';
 
 import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
@@ -19,6 +20,7 @@ import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
 import useDeletePebble from '@/lib/mutations/useDeletePebble';
+import { needsCoachHint } from '@/lib/scoring/score-labels';
 
 import { FocusState } from '@/types';
 
@@ -63,7 +65,7 @@ const DashboardClient = () => {
     ? new Map(
         (rankedData?.focused ?? []).map((r) => [
           r.pebble.id,
-          { badges: r.badges, explanation: r.explanation },
+          { badges: r.badges, explanation: r.explanation, score: r.final_score },
         ])
       )
     : new Map();
@@ -76,7 +78,7 @@ const DashboardClient = () => {
     ? new Map(
         (rankedData?.other ?? []).map((r) => [
           r.pebble.id,
-          { badges: r.badges, explanation: r.explanation },
+          { badges: r.badges, explanation: r.explanation, score: r.final_score },
         ])
       )
     : new Map();
@@ -90,6 +92,35 @@ const DashboardClient = () => {
     : flatPebbles.length > 0;
 
   const isScoring = rankedData?.scoringStatus?.isScoring ?? false;
+
+  // Collect all scores to determine if coach hint should show
+  const allScores = useMemo(() => {
+    if (!focusId || !rankedData) return [];
+    const scores: number[] = [];
+    if (rankedData.primary?.final_score !== undefined) {
+      scores.push(rankedData.primary.final_score);
+    }
+    rankedData.focused?.forEach((r) => scores.push(r.final_score));
+    rankedData.other?.forEach((r) => scores.push(r.final_score));
+    return scores;
+  }, [focusId, rankedData]);
+
+  // All pebbles for coach hint context
+  const allPebbles = useMemo(() => {
+    if (!focusId || !rankedData) return [];
+    const pebbles = [];
+    if (rankedData.primary) pebbles.push(rankedData.primary.pebble);
+    rankedData.focused?.forEach((r) => pebbles.push(r.pebble));
+    rankedData.other?.forEach((r) => pebbles.push(r.pebble));
+    return pebbles;
+  }, [focusId, rankedData]);
+
+  const showCoachHint =
+    focusId &&
+    focus?.statement &&
+    !isScoring &&
+    allScores.length > 0 &&
+    needsCoachHint(allScores);
 
   useEffect(() => {
     if (!isScoring) {
@@ -199,6 +230,15 @@ const DashboardClient = () => {
                     pebbles={otherPebblesList}
                     onDelete={onDelete}
                     badgesMap={otherBadgesMap}
+                  />
+                </CenteredComponent>
+              )}
+
+              {showCoachHint && (
+                <CenteredComponent ariaLabel="coach-hint">
+                  <CoachHint
+                    focusStatement={focus.statement}
+                    pebbles={allPebbles}
                   />
                 </CenteredComponent>
               )}

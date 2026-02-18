@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CircleQuestionMark } from 'lucide-react';
 
 import EllipsisIcon from '@/components/ui/Ellipsis/EllipsisIcon';
+import ScoreLabel from '@/components/ui/ScoreLabel/ScoreLabel';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
 import { Pebble } from '@/types';
@@ -20,11 +21,13 @@ const FocusedPebbleRow = ({
   onDelete,
   badges = [],
   explanation,
+  score,
 }: {
   pebble: Pebble;
   onDelete: (pebbleId: string) => void;
   badges?: Badge[];
   explanation?: string;
+  score?: number;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isStarSelected, setIsStarSelected] = useState(pebble.is_starred);
@@ -61,14 +64,17 @@ const FocusedPebbleRow = ({
               </a>
             </p>
 
-            <a
-              className="truncate text-sm text-slate-400"
-              href={pebble?.canonical_url}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              ({pebble.domain ? pebble.domain : pebble.canonical_url})
-            </a>
+            <div className="flex items-center gap-2">
+              <a
+                className="truncate text-sm text-slate-400"
+                href={pebble?.canonical_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                ({pebble.domain ? pebble.domain : pebble.canonical_url})
+              </a>
+              {score !== undefined && <ScoreLabel score={score} />}
+            </div>
             {badges.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 <div className="flex flex-wrap items-start gap-2 text-xs">

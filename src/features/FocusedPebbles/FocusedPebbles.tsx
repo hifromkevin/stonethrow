@@ -11,7 +11,7 @@ const FocusedPebbles = ({
 }: {
   savedPebbles: Pebble[];
   onDelete: (pebbleId: string) => void;
-  badgesMap?: Map<string, { badges: Badge[]; explanation?: string }>;
+  badgesMap?: Map<string, { badges: Badge[]; explanation?: string; score?: number }>;
 }) => (
   <NarrowComponent>
     <div className="mt-1 rounded-t-xl border border-slate-200 bg-white">
@@ -25,6 +25,7 @@ const FocusedPebbles = ({
               onDelete={onDelete}
               badges={meta?.badges}
               explanation={meta?.explanation}
+              score={meta?.score}
             />
           );
         })}

@@ -1,5 +1,6 @@
 import LocalHeading from '@/components/layout/LocalHeading';
 import Button from '@/components/ui/Button';
+import ScoreLabel from '@/components/ui/ScoreLabel/ScoreLabel';
 import cleanTitle from '@/lib/urls/cleanTitle';
 import { Pebble } from '@/types/pebble';
 import type { Badge } from '@/types/scoring';
@@ -51,11 +52,7 @@ const PrimaryFocusPebble = ({
         >
           ({primaryFocusPebble?.domain || primaryFocusPebble?.canonical_url})
         </a>
-        {score !== undefined && (
-          <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-            {Math.round(score)}% match
-          </span>
-        )}
+        {score !== undefined && <ScoreLabel score={score} />}
       </div>
 
       {/* Content */}
