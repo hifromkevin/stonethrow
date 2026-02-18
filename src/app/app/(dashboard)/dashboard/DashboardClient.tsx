@@ -53,6 +53,7 @@ const DashboardClient = () => {
   const primaryExplanation = focusId
     ? rankedData?.primary?.explanation
     : undefined;
+  const primaryScore = focusId ? rankedData?.primary?.final_score : undefined;
 
   const focusedPebblesList = focusId
     ? (rankedData?.focused ?? []).map((r) => r.pebble)
@@ -168,10 +169,12 @@ const DashboardClient = () => {
                     onDelete={onDelete}
                     badges={primaryBadges}
                     explanation={primaryExplanation}
+                    score={primaryScore}
                   />
                 </CenteredComponent>
               )}
 
+              {console.log('Focused Pebbles List:', focusedPebblesList)}
               {focusedPebblesList.length > 0 && (
                 <>
                   <CenteredComponent ariaLabel="focused-pebbles">

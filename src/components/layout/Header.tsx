@@ -18,7 +18,7 @@ const Header = () => {
 
         <nav className="mx-6 flex flex-1 items-center" aria-label="Primary">
           <div className="relative w-full max-w-md">
-            <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            {/* <Search className="absolute top-1/2 left-3 h-5 w-5 -translate-y-1/2 text-gray-400" />
 
             <label htmlFor="search-pebbles" className="sr-only">
               Search Pebbles
@@ -31,7 +31,7 @@ const Header = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="input-field pl-10 focus-visible:outline-none"
-            />
+            /> */}
           </div>
         </nav>
 
@@ -40,7 +40,7 @@ const Header = () => {
             aria-label="Open profile menu"
             className="btn-primary flex items-center space-x-2"
           >
-            <div className="h-6 w-6 rounded-full bg-slate-300" />
+            {/* <div className="h-6 w-6 rounded-full bg-slate-300" /> */}
           </button>
 
           <SignOutButton />

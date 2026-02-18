@@ -21,11 +21,13 @@ const PrimaryFocusPebble = ({
   onDelete,
   badges = [],
   explanation,
+  score,
 }: {
   primaryFocusPebble: Pebble;
   onDelete: (pebbleId: string) => void;
   badges?: Badge[];
   explanation?: string;
+  score?: number;
 }) => (
   <div className="mx-auto my-10 w-full max-w-2xl">
     <LocalHeading label="If you only do one thing today..." bigger />
@@ -49,6 +51,11 @@ const PrimaryFocusPebble = ({
         >
           ({primaryFocusPebble?.domain || primaryFocusPebble?.canonical_url})
         </a>
+        {score !== undefined && (
+          <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+            {Math.round(score)}% match
+          </span>
+        )}
       </div>
 
       {/* Content */}
@@ -74,7 +81,7 @@ const PrimaryFocusPebble = ({
             </p>
           </div>
 
-          <ul className="space-y-2 text-sm text-gray-600">
+          {/* <ul className="space-y-2 text-sm text-gray-600">
             {badges.map((badge) => (
               <li key={badge.name} className="flex gap-2">
                 <span className={BADGE_COLOR[badge.category]}>
@@ -83,7 +90,7 @@ const PrimaryFocusPebble = ({
                 {badge.name}
               </li>
             ))}
-          </ul>
+          </ul> */}
         </div>
       </div>
 
