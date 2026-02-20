@@ -42,9 +42,10 @@ export function getScoreLabel(score: number): ScoreLabelInfo {
 }
 
 /**
- * Threshold for triggering coach hint (no pebble above this = sparse collection)
+ * Threshold for triggering coach hint (top score below this = sparse/mismatched collection).
+ * Set to 65 so at least one pebble needs to be a genuine "Great Match" to suppress the hint.
  */
-export const COACH_HINT_THRESHOLD = 55;
+export const COACH_HINT_THRESHOLD = 65;
 
 /**
  * Check if collection needs a coach hint (no pebble scores above threshold)
@@ -52,6 +53,22 @@ export const COACH_HINT_THRESHOLD = 55;
 export function needsCoachHint(scores: number[]): boolean {
   if (scores.length === 0) return false;
   return !scores.some((score) => score > COACH_HINT_THRESHOLD);
+}
+
+/**
+ * Detect if difficulty/readiness is the scoring bottleneck rather than a relevance gap.
+ * Fires when pebbles are on-topic (decent focus_relevance) but contextual_readiness lags —
+ * a signal that the scoring system doesn't know the user's experience level.
+ */
+export function needsBackgroundHint(
+  scores: Array<{ focus_relevance: number; contextual_readiness: number }>
+): boolean {
+  if (scores.length === 0) return false;
+  const avg = (key: 'focus_relevance' | 'contextual_readiness') =>
+    scores.reduce((sum, s) => sum + s[key], 0) / scores.length;
+  const avgRelevance = avg('focus_relevance');
+  const avgReadiness = avg('contextual_readiness');
+  return avgRelevance >= 0.5 && avgReadiness < 0.5 && avgRelevance - avgReadiness > 0.15;
 }
 
 /**

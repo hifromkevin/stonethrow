@@ -1,22 +1,36 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Lightbulb } from 'lucide-react';
+import { Lightbulb, UserCircle } from 'lucide-react';
 import type { Pebble } from '@/types/pebble';
 import type { CoachHintResponse } from '@/lib/ai/coaching/coach-hint';
 
-type CoachHintProps = {
+type MissingPebblesProps = {
+  variant?: 'missing-pebbles';
   focusStatement: string;
   pebbles: Pebble[];
+  onAction?: never;
 };
 
-const CoachHint = ({ focusStatement, pebbles }: CoachHintProps) => {
+type BackgroundContextProps = {
+  variant: 'background-context';
+  focusStatement?: never;
+  pebbles?: never;
+  onAction?: () => void;
+};
+
+type CoachHintProps = MissingPebblesProps | BackgroundContextProps;
+
+const CoachHint = (props: CoachHintProps) => {
   const [hint, setHint] = useState<CoachHintResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const isMissingPebbles = props.variant !== 'background-context';
+
   useEffect(() => {
-    if (!focusStatement || pebbles.length === 0) {
+    if (!isMissingPebbles) return;
+    if (!props.focusStatement || props.pebbles.length === 0) {
       setHint(null);
       return;
     }
@@ -29,7 +43,10 @@ const CoachHint = ({ focusStatement, pebbles }: CoachHintProps) => {
         const res = await fetch('/app/api/coach-hint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ focusStatement, pebbles }),
+          body: JSON.stringify({
+            focusStatement: props.focusStatement,
+            pebbles: props.pebbles,
+          }),
         });
 
         const data = await res.json();
@@ -48,7 +65,45 @@ const CoachHint = ({ focusStatement, pebbles }: CoachHintProps) => {
     };
 
     fetchHint();
-  }, [focusStatement, pebbles]);
+  }, [isMissingPebbles, props.focusStatement, props.pebbles]);
+
+  if (props.variant === 'background-context') {
+    return (
+      <div className="mx-auto my-6 max-w-2xl">
+        <div className="rounded-xl border border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-5 shadow-sm">
+          <div className="mb-3 flex items-start gap-3">
+            <div className="rounded-lg bg-blue-100 p-2">
+              <UserCircle className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-blue-900">
+                Your pebbles are on-topic — but we don&apos;t know your level
+              </h3>
+              <p className="mt-1 text-sm text-blue-700">
+                The scoring system sees what you want to achieve, but not where
+                you&apos;re starting from. A seasoned engineer eyeing Staff is a
+                very different story than someone starting out — and your scores
+                should reflect that.
+              </p>
+            </div>
+          </div>
+
+          <div className="ml-12">
+            <p className="mb-3 text-sm text-blue-800">
+              Add a line about your background to your focus — even one sentence
+              helps calibrate your scores significantly.
+            </p>
+            <button
+              onClick={props.onAction}
+              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 active:bg-blue-800"
+            >
+              Update your focus
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -64,7 +119,7 @@ const CoachHint = ({ focusStatement, pebbles }: CoachHintProps) => {
   }
 
   if (error) {
-    return null; // Silently fail - don't block the UI
+    return null;
   }
 
   if (!hint) {

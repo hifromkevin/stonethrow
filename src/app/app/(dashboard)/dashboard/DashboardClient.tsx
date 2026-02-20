@@ -20,7 +20,7 @@ import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
 import useDeletePebble from '@/lib/mutations/useDeletePebble';
-import { needsCoachHint } from '@/lib/scoring/score-labels';
+import { needsCoachHint, needsBackgroundHint } from '@/lib/scoring/score-labels';
 
 import { FocusState } from '@/types';
 
@@ -93,7 +93,7 @@ const DashboardClient = () => {
 
   const isScoring = rankedData?.scoringStatus?.isScoring ?? false;
 
-  // Collect all scores to determine if coach hint should show
+  // Collect all final scores to determine if coach hint should show
   const allScores = useMemo(() => {
     if (!focusId || !rankedData) return [];
     const scores: number[] = [];
@@ -103,6 +103,22 @@ const DashboardClient = () => {
     rankedData.focused?.forEach((r) => scores.push(r.final_score));
     rankedData.other?.forEach((r) => scores.push(r.final_score));
     return scores;
+  }, [focusId, rankedData]);
+
+  // Collect focus sub-scores to detect when difficulty is the bottleneck
+  const allSubScores = useMemo(() => {
+    if (!focusId || !rankedData) return [];
+    const ranked = [
+      rankedData.primary,
+      ...(rankedData.focused ?? []),
+      ...(rankedData.other ?? []),
+    ];
+    return ranked
+      .filter((r) => r?.focus_score != null)
+      .map((r) => ({
+        focus_relevance: r!.focus_score!.focus_relevance,
+        contextual_readiness: r!.focus_score!.contextual_readiness,
+      }));
   }, [focusId, rankedData]);
 
   // All pebbles for coach hint context
@@ -115,7 +131,14 @@ const DashboardClient = () => {
     return pebbles;
   }, [focusId, rankedData]);
 
+  const showBackgroundHint =
+    focusId &&
+    !isScoring &&
+    allSubScores.length > 0 &&
+    needsBackgroundHint(allSubScores);
+
   const showCoachHint =
+    !showBackgroundHint &&
     focusId &&
     focus?.statement &&
     !isScoring &&
@@ -230,6 +253,17 @@ const DashboardClient = () => {
                     pebbles={otherPebblesList}
                     onDelete={onDelete}
                     badgesMap={otherBadgesMap}
+                  />
+                </CenteredComponent>
+              )}
+
+              {showBackgroundHint && (
+                <CenteredComponent ariaLabel="coach-hint">
+                  <CoachHint
+                    variant="background-context"
+                    onAction={() => {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
                   />
                 </CenteredComponent>
               )}
