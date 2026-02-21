@@ -1,14 +1,11 @@
 import { updateSession } from '@/lib/supabase/proxy';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// Hostnames for the app subdomain
 const APP_SUBDOMAIN_PATTERNS = ['app.getstonethrow.com', 'app.localhost'];
 
 function isAppSubdomain(hostname: string): boolean {
   return APP_SUBDOMAIN_PATTERNS.some(
-    (pattern) =>
-      hostname === pattern ||
-      hostname.startsWith(pattern + ':') // handles app.localhost:3000
+    (pattern) => hostname === pattern || hostname.startsWith(pattern + ':') // handles app.localhost:3000
   );
 }
 
@@ -16,9 +13,7 @@ export async function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || '';
   const { pathname } = request.nextUrl;
 
-  // App subdomain: rewrite to /app/... and handle auth
   if (isAppSubdomain(hostname)) {
-    // Rewrite API routes to /app/api/...
     if (pathname.startsWith('/api/')) {
       const url = request.nextUrl.clone();
       url.pathname = `/app${pathname}`;
