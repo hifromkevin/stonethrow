@@ -1,6 +1,7 @@
 import { updateSession } from '@/lib/supabase/proxy';
 import { NextResponse, type NextRequest } from 'next/server';
 
+// Hostnames for the app subdomain
 const APP_SUBDOMAIN_PATTERNS = ['app.getstonethrow.com', 'app.localhost'];
 
 function isAppSubdomain(hostname: string): boolean {
