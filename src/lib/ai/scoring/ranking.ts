@@ -52,8 +52,9 @@ export async function getRankedPebbles(
       focus,
       primary: null,
       focused: [],
+      collection: [],
       other: [],
-      scoringStatus: { isScoring: false, scoredCount: 0, totalCount: 0 },
+      scoringStatus: { isScoring: false, scoringStuck: false, scoredCount: 0, totalCount: 0 },
     };
   }
 
@@ -74,7 +75,7 @@ export async function getRankedPebbles(
       final_score:
         focusScore?.final_score ?? (contentScore?.content_score ?? 0.5) * 100,
       bucket:
-        (focusScore?.bucket as 'primary' | 'focused' | 'other') ?? 'other',
+        (focusScore?.bucket as 'primary' | 'focused' | 'collection' | 'other') ?? 'other',
       badges: toBadges(focusScore?.badges ?? []),
       explanation: focusScore?.explanation ?? undefined,
     };
@@ -86,10 +87,11 @@ export async function getRankedPebbles(
   const focusAge = focus
     ? Date.now() - new Date(focus.created_at).getTime()
     : 0;
-  const scoringStuck = scoredCount === 0 && focusAge > SCORING_TIMEOUT_MS;
+  // Stuck if ANY pebbles are unscored after the timeout (not just when none are scored)
+  const scoringStuck = scoredCount < totalCount && focusAge > SCORING_TIMEOUT_MS;
 
   const isScoring = focus !== null && scoredCount < totalCount && !scoringStuck;
-  const scoringStatus: ScoringStatus = { isScoring, scoredCount, totalCount };
+  const scoringStatus: ScoringStatus = { isScoring, scoringStuck, scoredCount, totalCount };
 
   rankedPebbles.sort((a, b) => b.final_score - a.final_score);
 
@@ -101,8 +103,9 @@ export async function getRankedPebbles(
           ? { ...rankedPebbles[0], bucket: 'primary' }
           : null,
       focused: [],
+      collection: [],
       other: rankedPebbles.slice(1),
-      scoringStatus: { isScoring: false, scoredCount: totalCount, totalCount },
+      scoringStatus: { isScoring: false, scoringStuck: false, scoredCount: totalCount, totalCount },
     };
   }
 
@@ -114,6 +117,10 @@ export async function getRankedPebbles(
     (r) => r.bucket === 'focused' && r !== primary
   );
 
+  const collection = rankedPebbles.filter(
+    (r) => r.bucket === 'collection' && r !== primary
+  );
+
   const other = rankedPebbles.filter(
     (r) => r.bucket === 'other' && r !== primary
   );
@@ -122,6 +129,7 @@ export async function getRankedPebbles(
     focus,
     primary: primary ? { ...primary, bucket: 'primary' } : null,
     focused,
+    collection,
     other,
     scoringStatus,
   };

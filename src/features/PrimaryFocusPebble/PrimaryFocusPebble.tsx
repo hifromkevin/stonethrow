@@ -23,12 +23,14 @@ const PrimaryFocusPebble = ({
   badges = [],
   explanation,
   score,
+  isScoring = false,
 }: {
   primaryFocusPebble: Pebble;
   onDelete: (pebbleId: string) => void;
   badges?: Badge[];
   explanation?: string;
   score?: number;
+  isScoring?: boolean;
 }) => (
   <div className="mx-auto my-10 w-full max-w-2xl">
     <LocalHeading label="If you only do one thing today..." bigger />
@@ -73,8 +75,7 @@ const PrimaryFocusPebble = ({
           <p className="mb-3 font-medium text-gray-900">Why this matters</p>
           <div className="border-l-4 border-[var(--color-primary)]">
             <p className="mb-4 ml-2 text-sm text-gray-900">
-              {explanation ??
-                'This was selected as your primary focus because it aligns with your goals.'}
+              {explanation ?? (isScoring ? 'Ranking your pebbles against your focus...' : 'No explanation available.')}
             </p>
           </div>
 

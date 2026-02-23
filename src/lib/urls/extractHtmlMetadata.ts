@@ -1,5 +1,6 @@
 import { HtmlMetadata } from '@/types';
 import extractRawText from '@/lib/urls/extractRawText';
+import { extractYouTubeTranscript } from '@/lib/urls/extractYouTubeTranscript';
 
 const extractHtmlMetadata = async (
   url: string
@@ -96,7 +97,16 @@ const extractHtmlMetadata = async (
         return null;
       }
     };
-    const { rawText, paywalled } = extractRawText(html);
+    const { rawText: scrapedText, paywalled } = extractRawText(html);
+
+    // For YouTube URLs, replace scraped page body with actual transcript.
+    // Scraped HTML for YouTube is navigation chrome with no content value.
+    const isYouTube =
+      url.includes('youtube.com/watch') || url.includes('youtu.be/');
+    const transcript = isYouTube
+      ? await extractYouTubeTranscript(url)
+      : null;
+    const rawText = transcript ?? scrapedText;
 
     return {
       title,

@@ -11,6 +11,7 @@ Score each dimension from 0 to 1:
 5. effort_friction (0-1): How easy is this to consume and act on? 1 = low friction (short, clear, accessible), 0 = high barrier (long, dense, requires prerequisites)
 
 Also provide:
+- content_category: Classify into exactly one of: "actionable" (teaches/enables a skill or task — tutorials, how-tos, courses, tool demos, build logs), "reference" (informs without direct instruction — articles, research, docs, news, case studies), "entertainment" (consumed for enjoyment — music, dance, comedy, vlogs, compilations, lifestyle), "commercial" (primarily sells — ads, product pitches, webinar funnels, affiliate-heavy reviews). Signals: "How to..." / "Tutorial" → actionable; "Official Music Video" / "Live Performance" → entertainment; promotional CTA-heavy → commercial. If ambiguous between actionable/reference, prefer actionable. If ambiguous between entertainment/reference (e.g. documentary), prefer reference.
 - confidence (0-1): Your confidence in these scores given the available content. Lower if content is thin or paywalled.
 - evidence: A 1-sentence summary of why you scored it this way, referencing specific content signals.
 
@@ -21,6 +22,7 @@ Respond with ONLY a JSON object, no other text:
   "time_to_value": 0.0,
   "time_relevance": 0.0,
   "effort_friction": 0.0,
+  "content_category": "actionable",
   "confidence": 0.0,
   "evidence": "..."
 }`;
@@ -37,6 +39,6 @@ export function buildContentScoreUserPrompt(pebble: {
     `Domain: ${pebble.domain ?? 'Unknown'}`,
     `Description: ${pebble.description ?? 'None'}`,
     `Paywalled: ${pebble.paywalled ? 'Yes (content may be incomplete)' : 'No'}`,
-    `Content:\n${pebble.raw_text?.slice(0, 1500) ?? 'No content available'}`,
+    `Content:\n${pebble.raw_text?.slice(0, 3000) ?? 'No content available'}`,
   ].join('\n');
 }

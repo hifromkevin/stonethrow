@@ -8,6 +8,8 @@ type CallLLMOptions = {
   userPrompt: string;
   maxTokens?: number;
   maxRetries?: number;
+  /** Cache the system prompt (ephemeral, 5-min TTL). Use for large static prompts sent in repeated batch calls. */
+  cacheSystemPrompt?: boolean;
 };
 
 export async function callLLM<T>(options: CallLLMOptions): Promise<T> {
@@ -17,6 +19,7 @@ export async function callLLM<T>(options: CallLLMOptions): Promise<T> {
     userPrompt,
     maxTokens = 1024,
     maxRetries = 2,
+    cacheSystemPrompt = false,
   } = options;
 
   let lastError: AIError | null = null;
@@ -26,7 +29,9 @@ export async function callLLM<T>(options: CallLLMOptions): Promise<T> {
       const response = await anthropic.messages.create({
         model,
         max_tokens: maxTokens,
-        system: systemPrompt,
+        system: cacheSystemPrompt
+          ? [{ type: 'text', text: systemPrompt, cache_control: { type: 'ephemeral' } }]
+          : systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],
       });
 

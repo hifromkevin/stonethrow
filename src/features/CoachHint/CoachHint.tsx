@@ -24,7 +24,7 @@ type CoachHintProps = MissingPebblesProps | BackgroundContextProps;
 const CoachHint = (props: CoachHintProps) => {
   const [hint, setHint] = useState<CoachHintResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const isMissingPebbles = props.variant !== 'background-context';
 
@@ -37,10 +37,10 @@ const CoachHint = (props: CoachHintProps) => {
 
     const fetchHint = async () => {
       setIsLoading(true);
-      setError(null);
+      setErrorCode(null);
 
       try {
-        const res = await fetch('/app/api/coach-hint', {
+        const res = await fetch('/api/coach-hint', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -52,13 +52,14 @@ const CoachHint = (props: CoachHintProps) => {
         const data = await res.json();
 
         if (!res.ok || !data.ok) {
-          throw new Error(data.message ?? 'Failed to generate hint');
+          setErrorCode(data.error ?? 'UNKNOWN_ERROR');
+          return;
         }
 
         setHint(data.data);
       } catch (err) {
         console.error('Failed to fetch coach hint:', err);
-        setError('Unable to generate suggestions right now');
+        setErrorCode('NETWORK_ERROR');
       } finally {
         setIsLoading(false);
       }
@@ -118,7 +119,17 @@ const CoachHint = (props: CoachHintProps) => {
     );
   }
 
-  if (error) {
+  if (errorCode === 'BILLING_ERROR') {
+    return (
+      <div className="mx-auto my-6 max-w-2xl">
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          AI credits are too low to generate suggestions. Add credits to restore this feature.
+        </div>
+      </div>
+    );
+  }
+
+  if (errorCode) {
     return null;
   }
 

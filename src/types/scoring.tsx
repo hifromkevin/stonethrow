@@ -25,6 +25,12 @@ export type Badge = {
 };
 
 // Stage A: Content Score (focus-independent)
+export type ContentCategory =
+  | 'actionable'
+  | 'entertainment'
+  | 'reference'
+  | 'commercial';
+
 export type ContentScoreMetrics = {
   actionability: number;
   signal_to_noise: number;
@@ -35,6 +41,7 @@ export type ContentScoreMetrics = {
 
 export type ContentScore = ContentScoreMetrics & {
   content_score: number;
+  content_category: ContentCategory;
   confidence: number;
   evidence: string;
 };
@@ -55,7 +62,7 @@ export type FocusScore = FocusScoreMetrics & {
   final_score: number;
   badges: BadgeName[];
   explanation: string;
-  bucket: 'primary' | 'focused' | 'other';
+  bucket: 'primary' | 'focused' | 'collection' | 'other';
   confidence: number;
   evidence: string;
 };
@@ -67,6 +74,7 @@ export type ContentScoreLLMResponse = {
   time_to_value: number;
   time_relevance: number;
   effort_friction: number;
+  content_category: ContentCategory;
   confidence: number;
   evidence: string;
 };
@@ -113,7 +121,7 @@ export type RankedPebble = {
   content_score?: ContentScore | null;
   focus_score?: FocusScore | null;
   final_score: number;
-  bucket: 'primary' | 'focused' | 'other';
+  bucket: 'primary' | 'focused' | 'collection' | 'other';
   badges: Badge[];
   explanation?: string;
 };
@@ -121,6 +129,7 @@ export type RankedPebble = {
 // Scoring status for UI feedback
 export type ScoringStatus = {
   isScoring: boolean;
+  scoringStuck: boolean;
   scoredCount: number;
   totalCount: number;
 };
@@ -130,6 +139,7 @@ export type RankedPebblesResponse = {
   focus: FocusStatement | null;
   primary: RankedPebble | null;
   focused: RankedPebble[];
+  collection: RankedPebble[];
   other: RankedPebble[];
   scoringStatus: ScoringStatus;
 };

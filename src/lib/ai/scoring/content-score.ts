@@ -5,7 +5,11 @@ import {
   buildContentScoreUserPrompt,
 } from '@/lib/ai/prompts/content-score';
 import createClient from '@/lib/supabase/server';
-import type { ContentScoreLLMResponse, ContentScore } from '@/types/scoring';
+import type {
+  ContentScoreLLMResponse,
+  ContentScore,
+  ContentCategory,
+} from '@/types/scoring';
 
 const WEIGHTS = {
   actionability: 0.3,
@@ -25,6 +29,13 @@ const computeWeightedScore = (metrics: ContentScoreLLMResponse): number =>
   WEIGHTS.time_relevance * metrics.time_relevance +
   WEIGHTS.effort_friction * metrics.effort_friction;
 
+const VALID_CATEGORIES: ContentCategory[] = [
+  'actionable',
+  'entertainment',
+  'reference',
+  'commercial',
+];
+
 const sanitizeMetrics = (
   raw: ContentScoreLLMResponse
 ): ContentScoreLLMResponse => ({
@@ -33,6 +44,9 @@ const sanitizeMetrics = (
   time_to_value: clamp(raw.time_to_value),
   time_relevance: clamp(raw.time_relevance),
   effort_friction: clamp(raw.effort_friction),
+  content_category: VALID_CATEGORIES.includes(raw.content_category)
+    ? raw.content_category
+    : 'reference',
   confidence: clamp(raw.confidence),
   evidence: raw.evidence ?? '',
 });
@@ -49,7 +63,7 @@ export async function scoreContent(pebble: {
     model: MODELS.CONTENT_SCORE,
     systemPrompt: CONTENT_SCORE_SYSTEM_PROMPT,
     userPrompt: buildContentScoreUserPrompt(pebble),
-    maxTokens: 512,
+    maxTokens: 1024,
   });
 
   const metrics = sanitizeMetrics(rawMetrics);
@@ -58,6 +72,7 @@ export async function scoreContent(pebble: {
   const result: ContentScore = {
     ...metrics,
     content_score,
+    content_category: metrics.content_category,
   };
 
   // Persist to database

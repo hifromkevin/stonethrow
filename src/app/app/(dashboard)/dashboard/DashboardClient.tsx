@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import usePebbles from '@/lib/queries/client/usePebbles';
 import useRankedPebbles from '@/lib/queries/client/useRankedPebbles';
 import useFocus from '@/lib/queries/useFocus';
@@ -20,7 +20,10 @@ import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
 import useDeletePebble from '@/lib/mutations/useDeletePebble';
-import { needsCoachHint, needsBackgroundHint } from '@/lib/scoring/score-labels';
+import {
+  needsCoachHint,
+  needsBackgroundHint,
+} from '@/lib/scoring/score-labels';
 
 import { FocusState } from '@/types';
 
@@ -42,76 +45,109 @@ const DashboardClient = () => {
   const { data: rankedData, isLoading: rankedLoading } =
     useRankedPebbles(focusId);
 
+  // Preserve the last fully-scored snapshot so the list doesn't jump to
+  // newest-to-oldest while re-scoring (all pebbles default to score 50).
+  const stableRankedRef = useRef<typeof rankedData>(undefined);
+  const stableFocusIdRef = useRef<string | undefined>(undefined);
+
+  const isCurrentlyScoring = rankedData?.scoringStatus?.isScoring ?? false;
+  if (!isCurrentlyScoring && rankedData) {
+    stableRankedRef.current = rankedData;
+    stableFocusIdRef.current = focusId;
+  }
+
+  // Fall back to stable data only when re-scoring the same focus.
+  // For a brand-new focus there's no stable data yet, so show live data.
+  const displayRankedData =
+    isCurrentlyScoring &&
+    stableFocusIdRef.current === focusId &&
+    stableRankedRef.current
+      ? stableRankedRef.current
+      : rankedData;
+
   const { data: flatPebbles = [], isLoading: flatLoading } = usePebbles();
 
   const isLoading = focusId ? rankedLoading : flatLoading;
 
   // Derive display data based on whether we have a focus
   const primaryPebble = focusId
-    ? (rankedData?.primary?.pebble ?? null)
+    ? (displayRankedData?.primary?.pebble ?? null)
     : (flatPebbles[0] ?? null);
 
-  const primaryBadges = focusId ? (rankedData?.primary?.badges ?? []) : [];
+  const primaryBadges = focusId
+    ? (displayRankedData?.primary?.badges ?? [])
+    : [];
   const primaryExplanation = focusId
-    ? rankedData?.primary?.explanation
+    ? displayRankedData?.primary?.explanation
     : undefined;
-  const primaryScore = focusId ? rankedData?.primary?.final_score : undefined;
+  const primaryScore = focusId
+    ? displayRankedData?.primary?.final_score
+    : undefined;
 
   const focusedPebblesList = focusId
-    ? (rankedData?.focused ?? []).map((r) => r.pebble)
+    ? (displayRankedData?.focused ?? []).map((r) => r.pebble)
     : flatPebbles.slice(1);
 
   const focusedBadgesMap = focusId
     ? new Map(
-        (rankedData?.focused ?? []).map((r) => [
+        (displayRankedData?.focused ?? []).map((r) => [
           r.pebble.id,
-          { badges: r.badges, explanation: r.explanation, score: r.final_score },
+          {
+            badges: r.badges,
+            explanation: r.explanation,
+            score: r.final_score,
+          },
         ])
       )
     : new Map();
 
   const otherPebblesList = focusId
-    ? (rankedData?.other ?? []).map((r) => r.pebble)
+    ? (displayRankedData?.other ?? []).map((r) => r.pebble)
     : flatPebbles.slice(1);
 
   const otherBadgesMap = focusId
     ? new Map(
-        (rankedData?.other ?? []).map((r) => [
+        (displayRankedData?.other ?? []).map((r) => [
           r.pebble.id,
-          { badges: r.badges, explanation: r.explanation, score: r.final_score },
+          {
+            badges: r.badges,
+            explanation: r.explanation,
+            score: r.final_score,
+          },
         ])
       )
     : new Map();
 
   const hasPebbles = focusId
     ? !!(
-        rankedData?.primary ||
-        (rankedData?.focused?.length ?? 0) > 0 ||
-        (rankedData?.other?.length ?? 0) > 0
+        displayRankedData?.primary ||
+        (displayRankedData?.focused?.length ?? 0) > 0 ||
+        (displayRankedData?.other?.length ?? 0) > 0
       )
     : flatPebbles.length > 0;
 
   const isScoring = rankedData?.scoringStatus?.isScoring ?? false;
+  const scoringStuck = rankedData?.scoringStatus?.scoringStuck ?? false;
 
   // Collect all final scores to determine if coach hint should show
   const allScores = useMemo(() => {
-    if (!focusId || !rankedData) return [];
+    if (!focusId || !displayRankedData) return [];
     const scores: number[] = [];
-    if (rankedData.primary?.final_score !== undefined) {
-      scores.push(rankedData.primary.final_score);
+    if (displayRankedData.primary?.final_score !== undefined) {
+      scores.push(displayRankedData.primary.final_score);
     }
-    rankedData.focused?.forEach((r) => scores.push(r.final_score));
-    rankedData.other?.forEach((r) => scores.push(r.final_score));
+    displayRankedData.focused?.forEach((r) => scores.push(r.final_score));
+    displayRankedData.other?.forEach((r) => scores.push(r.final_score));
     return scores;
-  }, [focusId, rankedData]);
+  }, [focusId, displayRankedData]);
 
   // Collect focus sub-scores to detect when difficulty is the bottleneck
   const allSubScores = useMemo(() => {
-    if (!focusId || !rankedData) return [];
+    if (!focusId || !displayRankedData) return [];
     const ranked = [
-      rankedData.primary,
-      ...(rankedData.focused ?? []),
-      ...(rankedData.other ?? []),
+      displayRankedData.primary,
+      ...(displayRankedData.focused ?? []),
+      ...(displayRankedData.other ?? []),
     ];
     return ranked
       .filter((r) => r?.focus_score != null)
@@ -119,17 +155,18 @@ const DashboardClient = () => {
         focus_relevance: r!.focus_score!.focus_relevance,
         contextual_readiness: r!.focus_score!.contextual_readiness,
       }));
-  }, [focusId, rankedData]);
+  }, [focusId, displayRankedData]);
 
   // All pebbles for coach hint context
   const allPebbles = useMemo(() => {
-    if (!focusId || !rankedData) return [];
+    if (!focusId || !displayRankedData) return [];
     const pebbles = [];
-    if (rankedData.primary) pebbles.push(rankedData.primary.pebble);
-    rankedData.focused?.forEach((r) => pebbles.push(r.pebble));
-    rankedData.other?.forEach((r) => pebbles.push(r.pebble));
+    if (displayRankedData.primary)
+      pebbles.push(displayRankedData.primary.pebble);
+    displayRankedData.focused?.forEach((r) => pebbles.push(r.pebble));
+    displayRankedData.other?.forEach((r) => pebbles.push(r.pebble));
     return pebbles;
-  }, [focusId, rankedData]);
+  }, [focusId, displayRankedData]);
 
   const showBackgroundHint =
     focusId &&
@@ -206,6 +243,32 @@ const DashboardClient = () => {
           </CenteredComponent>
         )}
 
+        {scoringStuck && (
+          <CenteredComponent ariaLabel="scoring-error">
+            <div className="mx-auto my-4 max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              Sorting couldn&apos;t complete — AI credits may be too low. Add
+              credits and re-save your focus to try again.
+            </div>
+          </CenteredComponent>
+        )}
+
+        {showBackgroundHint && (
+          <CenteredComponent ariaLabel="coach-hint">
+            <CoachHint
+              variant="background-context"
+              onAction={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          </CenteredComponent>
+        )}
+
+        {showCoachHint && (
+          <CenteredComponent ariaLabel="coach-hint">
+            <CoachHint focusStatement={focus.statement} pebbles={allPebbles} />
+          </CenteredComponent>
+        )}
+
         {/* Pebbles - dimmed when scoring */}
         <div
           className={
@@ -224,6 +287,7 @@ const DashboardClient = () => {
                     badges={primaryBadges}
                     explanation={primaryExplanation}
                     score={primaryScore}
+                    isScoring={isScoring}
                   />
                 </CenteredComponent>
               )}
@@ -253,26 +317,6 @@ const DashboardClient = () => {
                     pebbles={otherPebblesList}
                     onDelete={onDelete}
                     badgesMap={otherBadgesMap}
-                  />
-                </CenteredComponent>
-              )}
-
-              {showBackgroundHint && (
-                <CenteredComponent ariaLabel="coach-hint">
-                  <CoachHint
-                    variant="background-context"
-                    onAction={() => {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                  />
-                </CenteredComponent>
-              )}
-
-              {showCoachHint && (
-                <CenteredComponent ariaLabel="coach-hint">
-                  <CoachHint
-                    focusStatement={focus.statement}
-                    pebbles={allPebbles}
                   />
                 </CenteredComponent>
               )}
