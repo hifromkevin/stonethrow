@@ -4,7 +4,7 @@ export default function MarketingPage() {
   // In production, use absolute URL; locally, relative works for same host
   const appUrl =
     process.env.NODE_ENV === 'production'
-      ? 'https://app.getstonethrow.com'
+      ? 'https://app.stonethrow.io'
       : 'http://app.localhost:3000';
 
   return (
