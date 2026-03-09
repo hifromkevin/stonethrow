@@ -75,18 +75,20 @@ const FocusedPebbleRow = ({
               </a>
               {score !== undefined && <ScoreLabel score={score} />}
             </div>
-            {badges.length > 0 && (
+            {/* {badges.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">
                 <div className="flex flex-wrap items-start gap-2 text-xs">
                   {badges.map((badge, i) => (
                     <span key={badge.name}>
                       {i > 0 && <span className="mr-2 text-slate-300">•</span>}
-                      <span className={BADGE_COLOR[badge.category]}>{badge.name}</span>
+                      <span className={BADGE_COLOR[badge.category]}>
+                        {badge.name}
+                      </span>
                     </span>
                   ))}
                 </div>
               </div>
-            )}
+            )} */}
           </div>
 
           <Tooltip content={explanation ?? 'Scoring in progress...'}>
