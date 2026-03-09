@@ -1,7 +1,7 @@
-export default function MarketingLayout({
+const MarketingLayout = ({
   children,
 }: {
   children: React.ReactNode;
-}) {
-  return <>{children}</>;
-}
+}) => <>{children}</>
+
+export default MarketingLayout;
