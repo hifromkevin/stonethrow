@@ -1,7 +1,4 @@
-import Link from 'next/link';
-
-export default function MarketingPage() {
-  // In production, use absolute URL; locally, relative works for same host
+const MarketingPage = () => {
   const appUrl =
     process.env.NODE_ENV === 'production'
       ? 'https://app.stonethrow.io'
@@ -10,7 +7,10 @@ export default function MarketingPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
       <div className="px-6 text-center">
-        <img src="/logo.svg" alt="Stonethrow" className="mx-auto mb-8 h-16" />
+        {/* <img src="/logo.svg" alt="Stonethrow" className="mx-auto mb-8 h-16" /> */}
+        <h1 className="var(--font-afacad) var(--tracking-widest) text-2xl text-slate-800">
+          stonethrow
+        </h1>
 
         <h1 className="mb-4 text-4xl font-bold text-slate-900">
           Focus on what matters
@@ -38,4 +38,5 @@ export default function MarketingPage() {
       </div>
     </main>
   );
-}
+};
+export default MarketingPage;

@@ -12,7 +12,10 @@ const Header = () => {
       <div className="mx-auto flex w-full max-w-5xl items-center px-8 py-2">
         <div className="flex items-center space-x-6">
           <a href="/" aria-label="Stonethrow home">
-            <img src="/logo.svg" alt="Stonethrow logo" className="h-8" />
+            {/* <img src="/logo.svg" alt="Stonethrow logo" className="h-8" /> */}
+            <h1 className="var(--font-afacad) var(--tracking-widest) text-2xl text-slate-800">
+              stonethrow
+            </h1>
           </a>
         </div>
 

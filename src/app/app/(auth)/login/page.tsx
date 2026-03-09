@@ -41,8 +41,10 @@ export default function LoginPage() {
         <CenteredComponent ariaLabel="login-card">
           <Card className="m-10 w-full max-w-xl">
             <div className="flex flex-col items-center px-6 py-6 text-center">
-              <img src="/logo.svg" alt="stonethrow" className="h-12" />
-
+              {/* <img src="/logo.svg" alt="stonethrow" className="h-12" /> */}
+              <h1 className="var(--font-afacad) var(--tracking-widest) text-2xl text-slate-800">
+                stonethrow
+              </h1>
               <form
                 className="mt-8 w-full space-y-4"
                 onSubmit={(e) => {
@@ -97,7 +99,6 @@ export default function LoginPage() {
                   disabled={loading}
                 />
               </form>
-
               <footer className="mt-6 w-full">
                 <Button
                   label="Don't have a Stonethrow account? Sign up"
