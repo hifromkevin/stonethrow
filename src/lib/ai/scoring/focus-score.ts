@@ -206,13 +206,25 @@ export async function scoreFocusBatch(
     domain: p.domain,
     paywalled: p.paywalled ?? false,
     content_score: p.pebble_content_scores?.[0]?.content_score ?? 0.5,
-    content_category: p.pebble_content_scores?.[0]?.content_category ?? undefined,
+    content_category:
+      p.pebble_content_scores?.[0]?.content_category ?? undefined,
   }));
 
-  // Split into batches
+  // pre-filter based on quality and category
+  const pebblesToScore = pebbleInputs.filter(
+    (p) =>
+      (p.content_score ?? 0) >= 0.3 &&
+      p.content_category !== 'entertainment' &&
+      p.content_category !== 'commercial'
+  );
+  const skippedPebbles = pebbleInputs.filter(
+    (p) => !pebblesToScore.includes(p)
+  );
+
+  // Split remaining pebbles into batches
   const batches: PebbleInput[][] = [];
-  for (let i = 0; i < pebbleInputs.length; i += MAX_BATCH_SIZE) {
-    batches.push(pebbleInputs.slice(i, i + MAX_BATCH_SIZE));
+  for (let i = 0; i < pebblesToScore.length; i += MAX_BATCH_SIZE) {
+    batches.push(pebblesToScore.slice(i, i + MAX_BATCH_SIZE));
   }
 
   console.log(
@@ -341,7 +353,36 @@ export async function scoreFocusBatch(
   }
 
   // Flatten all batch results into single array
-  const allFocusScores = batchResults.flat();
+  let allFocusScores = batchResults.flat();
+
+  // Add default scores for pebbles we filtered out earlier
+  if (skippedPebbles.length > 0) {
+    const skippedDefaults = skippedPebbles.map((p) => {
+      const base = {
+        focus_relevance: 0.3,
+        momentum: 0.3,
+        contextual_readiness: 0.3,
+        difficulty_estimate: 0.5,
+        difficulty_fit: 1,
+        momentum_adjusted: 0.3,
+        contextual_readiness_adjusted: 0.3,
+        relevance_score: 0.3,
+        final_score: 10,
+        badges: [],
+        explanation:
+          'Filtered out — content quality too low or not actionable.',
+        bucket: 'other' as const,
+        confidence: 0.3,
+        evidence: '',
+      };
+      return {
+        ...base,
+        pebble_id: p.id,
+        focus_id: focusId,
+      };
+    });
+    allFocusScores = allFocusScores.concat(skippedDefaults);
+  }
 
   // Assign buckets across ALL scores
   if (allFocusScores.length > 0) {

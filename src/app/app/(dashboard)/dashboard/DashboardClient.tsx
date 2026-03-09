@@ -84,13 +84,17 @@ const DashboardClient = () => {
     ? displayRankedData?.primary?.final_score
     : undefined;
 
+  const fullFocused = focusId ? (displayRankedData?.focused ?? []) : [];
+  const focusedRanked = fullFocused.slice(0, 7);
+  const remainingFocused = fullFocused.slice(7);
+
   const focusedPebblesList = focusId
-    ? (displayRankedData?.focused ?? []).map((r) => r.pebble)
-    : flatPebbles.slice(1);
+    ? focusedRanked.map((r) => r.pebble)
+    : flatPebbles.slice(1, 8);
 
   const focusedBadgesMap = focusId
     ? new Map(
-        (displayRankedData?.focused ?? []).map((r) => [
+        focusedRanked.map((r) => [
           r.pebble.id,
           {
             badges: r.badges,
@@ -102,20 +106,30 @@ const DashboardClient = () => {
     : new Map();
 
   const otherPebblesList = focusId
-    ? (displayRankedData?.other ?? []).map((r) => r.pebble)
-    : flatPebbles.slice(1);
+    ? [...remainingFocused, ...(displayRankedData?.other ?? [])].map(
+        (r) => r.pebble
+      )
+    : flatPebbles.slice(8);
 
   const otherBadgesMap = focusId
-    ? new Map(
-        (displayRankedData?.other ?? []).map((r) => [
+    ? new Map([
+        ...remainingFocused.map((r) => [
           r.pebble.id,
           {
             badges: r.badges,
             explanation: r.explanation,
             score: r.final_score,
           },
-        ])
-      )
+        ]),
+        ...(displayRankedData?.other ?? []).map((r) => [
+          r.pebble.id,
+          {
+            badges: r.badges,
+            explanation: r.explanation,
+            score: r.final_score,
+          },
+        ]),
+      ])
     : new Map();
 
   const hasPebbles = focusId
