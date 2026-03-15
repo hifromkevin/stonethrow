@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Lightbulb, UserCircle } from 'lucide-react';
 import type { Pebble } from '@/types/pebble';
 import type { CoachHintResponse } from '@/lib/ai/coaching/coach-hint';
@@ -27,6 +27,9 @@ const CoachHint = (props: CoachHintProps) => {
   const [errorCode, setErrorCode] = useState<string | null>(null);
 
   const isMissingPebbles = props.variant !== 'background-context';
+  // Prevent re-fetching on every polling update — only fetch once per focus statement
+  const hasFetched = useRef(false);
+  const lastFocusStatement = useRef<string>('');
 
   useEffect(() => {
     if (!isMissingPebbles) return;
@@ -34,6 +37,15 @@ const CoachHint = (props: CoachHintProps) => {
       setHint(null);
       return;
     }
+
+    // Reset if the focus statement changed (user updated their focus)
+    if (props.focusStatement !== lastFocusStatement.current) {
+      hasFetched.current = false;
+      lastFocusStatement.current = props.focusStatement;
+    }
+
+    if (hasFetched.current) return;
+    hasFetched.current = true;
 
     const fetchHint = async () => {
       setIsLoading(true);

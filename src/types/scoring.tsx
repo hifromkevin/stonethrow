@@ -107,6 +107,7 @@ export type FocusStatement = {
   model_version: string | null;
   created_at: string;
   updated_at: string;
+  embedding: number[] | null;
 };
 
 export type FocusSafetyResult = {
@@ -124,6 +125,7 @@ export type RankedPebble = {
   bucket: 'primary' | 'focused' | 'collection' | 'other';
   badges: Badge[];
   explanation?: string;
+  isEnriching?: boolean; // True if waiting for Haiku enrichment (explanations/badges)
 };
 
 // Scoring status for UI feedback

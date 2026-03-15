@@ -3,9 +3,22 @@ import createClient from '@/lib/supabase/server';
 import { AIError } from '@/lib/ai/errors';
 import { validateFocusSafety } from '@/lib/ai/safety/focus-validator';
 import { scoreFocusBatch } from '@/lib/ai/scoring/focus-score';
+import {
+  rankByEmbedding,
+  storeFocusEmbedding,
+  type EmbeddingRankResult,
+} from '@/lib/ai/embeddings/embed-focus';
+import { getRankedPebbles } from '@/lib/ai/scoring/ranking';
 import { MODELS } from '@/lib/ai/client';
 
+const focusStartTime = Date.now();
+const logTime = (stage: string) => {
+  const elapsed = Date.now() - focusStartTime;
+  console.log(`[FOCUS_TIMING] ${stage}: ${elapsed}ms`);
+};
+
 export async function POST(req: Request) {
+  logTime('FOCUS_START');
   const supabase = await createClient();
   const {
     data: { user },
@@ -32,6 +45,7 @@ export async function POST(req: Request) {
 
   // Step 1: Validate safety
   const safetyResult = await validateFocusSafety(trimmed);
+  logTime('FOCUS_VALIDATED');
 
   if (!safetyResult.is_safe) {
     return NextResponse.json(
@@ -67,31 +81,60 @@ export async function POST(req: Request) {
 
   if (error) {
     console.error('Failed to insert focus:', error);
-    return NextResponse.json(
-      { ok: false, error: 'DB_ERROR' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'DB_ERROR' }, { status: 500 });
   }
 
-  // Step 4: Kick off Stage B scoring in background
-  console.log('🎯 Focus saved, kicking off scoring for:', focus.id);
+  // Step 4: Get embedding-based ranking immediately (FAST PATH)
+  // This returns ranked results in ~200ms + embedding API call, no Haiku calls
+  let rankedResults;
+  let embeddingRanks: EmbeddingRankResult[] = [];
+  let focusEmbedding: number[] | null = null;
+  try {
+    const result = await rankByEmbedding(focus.statement, user.id);
+    embeddingRanks = result.ranks;
+    focusEmbedding = result.embedding;
+    logTime('EMBEDDING_RANKED');
+
+    rankedResults = await getRankedPebbles(user.id, focus.id, embeddingRanks);
+  } catch (err) {
+    console.error('Failed to get embedding ranking, falling back:', err);
+    rankedResults = await getRankedPebbles(user.id, focus.id);
+  }
+
+  logTime('RESULTS_RETURNED');
+
+  // Step 5: Store the focus embedding in the background using the vector we already have
+  // (avoids a second Voyage AI call)
   after(async () => {
-    console.log('🚀 after() callback started for focus:', focus.id);
-    try {
-      await scoreFocusBatch(user.id, focus.id, focus.statement);
-      console.log('✅ scoreFocusBatch completed for focus:', focus.id);
-    } catch (err) {
-      if (err instanceof AIError) {
-        console.error(
-          `❌ Stage B scoring failed for focus: ${focus.id} [${err.code}] ${err.message}`
-        );
-      } else {
-        console.error('❌ Stage B scoring failed for focus:', focus.id, err);
-      }
+    if (focusEmbedding) {
+      await storeFocusEmbedding(focus.id, focusEmbedding);
     }
   });
 
-  return NextResponse.json({ ok: true, data: focus });
+  // Step 6: Kick off Haiku enrichment for top 15 in background (non-blocking)
+  // User already has ranked results, this just enriches them with explanations/badges
+  after(async () => {
+    logTime('ENRICHMENT_START');
+    try {
+      await scoreFocusBatch(user.id, focus.id, focus.statement);
+      logTime('ENRICHMENT_DONE');
+    } catch (err) {
+      if (err instanceof AIError) {
+        console.error(
+          `⚠️ Background enrichment degraded for focus: ${focus.id} [${err.code}] ${err.message}`
+        );
+      } else {
+        console.error(
+          '⚠️ Background enrichment degraded for focus:',
+          focus.id,
+          err
+        );
+      }
+      // Don't fail the request — user already has rankings
+    }
+  });
+
+  return NextResponse.json({ ok: true, data: rankedResults });
 }
 
 export async function GET() {
@@ -116,10 +159,7 @@ export async function GET() {
 
   if (error && error.code !== 'PGRST116') {
     // PGRST116 = no rows found
-    return NextResponse.json(
-      { ok: false, error: 'DB_ERROR' },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: false, error: 'DB_ERROR' }, { status: 500 });
   }
 
   return NextResponse.json({ ok: true, data: data ?? null });

@@ -113,22 +113,28 @@ const DashboardClient = () => {
 
   const otherBadgesMap = focusId
     ? new Map([
-        ...remainingFocused.map((r) => [
-          r.pebble.id,
-          {
-            badges: r.badges,
-            explanation: r.explanation,
-            score: r.final_score,
-          },
-        ]),
-        ...(displayRankedData?.other ?? []).map((r) => [
-          r.pebble.id,
-          {
-            badges: r.badges,
-            explanation: r.explanation,
-            score: r.final_score,
-          },
-        ]),
+        ...remainingFocused.map(
+          (r) =>
+            [
+              r.pebble.id,
+              {
+                badges: r.badges,
+                explanation: r.explanation,
+                score: r.final_score,
+              },
+            ] as const
+        ),
+        ...(displayRankedData?.other ?? []).map(
+          (r) =>
+            [
+              r.pebble.id,
+              {
+                badges: r.badges,
+                explanation: r.explanation,
+                score: r.final_score,
+              },
+            ] as const
+        ),
       ])
     : new Map();
 
@@ -283,14 +289,8 @@ const DashboardClient = () => {
           </CenteredComponent>
         )}
 
-        {/* Pebbles - dimmed when scoring */}
-        <div
-          className={
-            isScoring
-              ? 'opacity-50 transition-opacity duration-300'
-              : 'transition-opacity duration-300'
-          }
-        >
+        {/* Pebbles - always visible; enrichment updates badges/explanations in-place */}
+        <div className="transition-opacity duration-300">
           {hasPebbles && (
             <>
               {primaryPebble && (

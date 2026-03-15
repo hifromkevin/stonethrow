@@ -8,7 +8,9 @@ export type AIErrorCode =
   | 'SERVER_ERROR'
   | 'NETWORK_ERROR'
   | 'PARSE_ERROR'
-  | 'UNKNOWN_ERROR';
+  | 'UNKNOWN_ERROR'
+  | 'INVALID_INPUT'
+  | 'MISSING_API_KEY';
 
 export class AIError extends Error {
   readonly code: AIErrorCode;
@@ -64,10 +66,7 @@ export function classifyAIError(err: unknown): AIError {
     }
 
     // Authentication errors (401)
-    if (
-      err instanceof Anthropic.AuthenticationError ||
-      err.status === 401
-    ) {
+    if (err instanceof Anthropic.AuthenticationError || err.status === 401) {
       return new AIError(
         'Invalid Anthropic API key. Please check your configuration.',
         'AUTH_ERROR',
@@ -76,10 +75,7 @@ export function classifyAIError(err: unknown): AIError {
     }
 
     // Permission denied (403)
-    if (
-      err instanceof Anthropic.PermissionDeniedError ||
-      err.status === 403
-    ) {
+    if (err instanceof Anthropic.PermissionDeniedError || err.status === 403) {
       return new AIError(
         'Permission denied. Your API key may not have access to this model.',
         'AUTH_ERROR',
@@ -110,19 +106,21 @@ export function classifyAIError(err: unknown): AIError {
 
     // Other bad requests (400)
     if (err.status === 400) {
-      return new AIError(
-        `Invalid request: ${err.message}`,
-        'INVALID_REQUEST',
-        { retryable: false, statusCode: 400, requestId, cause: err }
-      );
+      return new AIError(`Invalid request: ${err.message}`, 'INVALID_REQUEST', {
+        retryable: false,
+        statusCode: 400,
+        requestId,
+        cause: err,
+      });
     }
 
     // Fallback for other API errors
-    return new AIError(
-      err.message || 'Unknown API error',
-      'UNKNOWN_ERROR',
-      { retryable: false, statusCode: err.status, requestId, cause: err }
-    );
+    return new AIError(err.message || 'Unknown API error', 'UNKNOWN_ERROR', {
+      retryable: false,
+      statusCode: err.status,
+      requestId,
+      cause: err,
+    });
   }
 
   // Network errors
