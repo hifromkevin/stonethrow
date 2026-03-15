@@ -10,7 +10,7 @@ function isAppSubdomain(hostname: string): boolean {
   );
 }
 
-export async function middleware(request: NextRequest) {
+const proxy = async (request: NextRequest) => {
   const hostname = request.headers.get('host') || '';
   const { pathname } = request.nextUrl;
 
@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
 
   // Root domain: serve marketing site (no auth, no rewrite)
   return NextResponse.next();
-}
+};
 
 export const config = {
   matcher: [
@@ -51,3 +51,5 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
+
+export default proxy;
