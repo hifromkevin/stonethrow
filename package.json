@@ -15,7 +15,7 @@
     "@anthropic-ai/sdk": "^0.72.1",
     "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.89.0",
+    "@supabase/supabase-js": "^2.99.1",
     "cheerio": "^1.1.2",
     "dotenv": "^17.3.1",
     "he": "^1.2.0",
