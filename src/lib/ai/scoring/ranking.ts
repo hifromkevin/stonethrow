@@ -262,7 +262,7 @@ export async function getRankedPebbles(
           isEnriching: !focusScore,
         };
       })
-      .filter((r): r is RankedPebble => r !== null);
+      .filter((r) => r !== null) as RankedPebble[];
 
     // Step 4: Track scoring status
     // "Enriching" = waiting for Haiku explanations for pebbles that don't have focus_score yet
