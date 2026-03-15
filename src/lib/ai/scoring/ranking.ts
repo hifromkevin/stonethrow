@@ -204,7 +204,7 @@ export async function getRankedPebbles(
 
     // Step 3: Build ranked results, maintaining embedding order
     // Also check for Haiku enrichment (focus_score) per pebble
-    const rankedPebbles: RankedPebble[] = embeddingRanks
+    const rankedPebbles = embeddingRanks
       .map((rank, index) => {
         const pebble = pebbles.find((p: any) => p.id === rank.pebble_id);
         if (!pebble) return null;
