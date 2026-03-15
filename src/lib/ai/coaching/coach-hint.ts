@@ -3,26 +3,45 @@ import { MODELS } from '@/lib/ai/client';
 import type { Pebble } from '@/types/pebble';
 
 export type CoachHintResponse = {
+  is_strong_collection: boolean;
   acknowledgment: string;
-  missing_content_type: string;
+  missing_content_type?: string;
   suggestions: string[];
 };
 
 const SYSTEM_PROMPT = `You are a supportive content coach helping users build a better collection of resources for their goals.
 
-The user has set a focus statement describing what they want to accomplish. Their current pebble collection (saved articles, resources, etc.) isn't quite matching their focus well enough yet.
+The user has set a focus statement and you can see the content they've saved. Your job is to give an honest, useful assessment.
 
-Your job is to:
-1. Acknowledge what their focus is trying to accomplish (be specific and empathetic)
-2. Identify what TYPE of content seems to be missing based on their focus and what they've saved
-3. Suggest 2-3 specific content topics they should try adding
+IMPORTANT: If their collection already contains strong, relevant content for their focus, say so clearly. Acknowledge what they have and encourage them to dive into their top matches. Only suggest additions if there is a genuine, specific gap — not a vague "you could always add more about X." It is perfectly valid — and often the right answer — to tell the user their collection is well-suited for their focus.
 
-Frame this positively - they're close, they just need a few more pieces. Don't say "nothing matched" or be discouraging.
+Decide first: is this a strong collection for the stated focus, or is there a real gap?
+
+If STRONG collection:
+- Set is_strong_collection to true
+- Write an acknowledgment that names the specific strengths you see
+- Leave missing_content_type empty and suggestions empty
+
+If there is a GENUINE GAP:
+- Set is_strong_collection to false
+- Acknowledge their goal specifically (1-2 sentences)
+- Name the type of content that's actually missing (be precise, not generic)
+- Suggest 2-3 specific topics to look for
 
 Respond with JSON only:
 {
+  "is_strong_collection": true,
+  "acknowledgment": "Your collection is well-suited for this focus — you have strong coverage of [specific topics]. Consider diving into your top matches first.",
+  "missing_content_type": "",
+  "suggestions": []
+}
+
+OR:
+
+{
+  "is_strong_collection": false,
   "acknowledgment": "A brief, specific acknowledgment of their goal (1-2 sentences)",
-  "missing_content_type": "What category of content is lacking (e.g., 'practical tutorials', 'case studies', 'beginner guides')",
+  "missing_content_type": "What specific category of content is genuinely lacking",
   "suggestions": ["Specific topic 1", "Specific topic 2", "Specific topic 3"]
 }`;
 

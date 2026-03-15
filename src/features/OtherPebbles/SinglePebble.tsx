@@ -1,7 +1,6 @@
 import { CircleQuestionMark } from 'lucide-react';
 
 import EllipsisIcon from '@/components/ui/Ellipsis/EllipsisIcon';
-import ScoreLabel from '@/components/ui/ScoreLabel/ScoreLabel';
 import Tooltip from '@/components/ui/Tooltip/Tooltip';
 
 import { Pebble } from '@/types';
@@ -12,12 +11,10 @@ const SinglePebble = ({
   pebble,
   onDelete,
   explanation,
-  score,
 }: {
   pebble: Pebble;
   onDelete: (pebbleId: string) => void;
   explanation?: string;
-  score?: number;
 }) => (
   <div className="relative odd:bg-white even:bg-slate-50/40 hover:bg-slate-50/50">
     <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-2">
@@ -41,7 +38,6 @@ const SinglePebble = ({
           >
             ({pebble.domain ? pebble.domain : pebble.canonical_url})
           </a>
-          {score !== undefined && <ScoreLabel score={score} />}
         </div>
       </div>
 

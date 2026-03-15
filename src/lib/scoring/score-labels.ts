@@ -5,6 +5,8 @@
 
 export type ScoreLabel =
   | 'Top Match'
+  | 'Strong Match'
+  | 'Good Match'
   | 'Great Match'
   | 'Decent Match'
   | 'Loosely Related'
@@ -39,6 +41,23 @@ export function getScoreLabel(score: number): ScoreLabelInfo {
     return { label: 'Loosely Related', tier: 'standard', category: 'low' };
   }
   return { label: 'Low Relevance', tier: 'standard', category: 'minimal' };
+}
+
+/**
+ * Convert a 1-based rank position to a display label.
+ * Rank 1 → "Top Match", 2–4 → "Strong Match", 5–7 → "Good Match", 8+ → null (no badge).
+ */
+export function getRankLabel(rank: number): ScoreLabelInfo | null {
+  if (rank === 1) {
+    return { label: 'Top Match', tier: 'high', category: 'excellent' };
+  }
+  if (rank <= 4) {
+    return { label: 'Strong Match', tier: 'standard', category: 'good' };
+  }
+  if (rank <= 7) {
+    return { label: 'Good Match', tier: 'standard', category: 'moderate' };
+  }
+  return null;
 }
 
 /**

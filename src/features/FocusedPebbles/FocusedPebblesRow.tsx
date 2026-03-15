@@ -21,13 +21,13 @@ const FocusedPebbleRow = ({
   onDelete,
   badges = [],
   explanation,
-  score,
+  rank,
 }: {
   pebble: Pebble;
   onDelete: (pebbleId: string) => void;
   badges?: Badge[];
   explanation?: string;
-  score?: number;
+  rank?: number;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isStarSelected, setIsStarSelected] = useState(pebble.is_starred);
@@ -73,7 +73,7 @@ const FocusedPebbleRow = ({
               >
                 ({pebble.domain ? pebble.domain : pebble.canonical_url})
               </a>
-              {score !== undefined && <ScoreLabel score={score} />}
+              {rank !== undefined && <ScoreLabel rank={rank} />}
             </div>
             {/* {badges.length > 0 && (
               <div className="mt-2 flex flex-wrap gap-2">

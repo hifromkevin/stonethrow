@@ -22,14 +22,14 @@ const PrimaryFocusPebble = ({
   onDelete,
   badges = [],
   explanation,
-  score,
+  rank,
   isScoring = false,
 }: {
   primaryFocusPebble: Pebble;
   onDelete: (pebbleId: string) => void;
   badges?: Badge[];
   explanation?: string;
-  score?: number;
+  rank?: number;
   isScoring?: boolean;
 }) => (
   <div className="mx-auto my-10 w-full max-w-2xl">
@@ -54,7 +54,7 @@ const PrimaryFocusPebble = ({
         >
           ({primaryFocusPebble?.domain || primaryFocusPebble?.canonical_url})
         </a>
-        {score !== undefined && <ScoreLabel score={score} />}
+        {rank !== undefined && <ScoreLabel rank={rank} />}
       </div>
 
       {/* Content */}

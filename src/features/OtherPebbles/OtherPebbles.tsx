@@ -24,7 +24,6 @@ const OtherPebbles = ({
             key={`${pebble.id}-${idx}`}
             onDelete={onDelete}
             explanation={meta?.explanation}
-            score={meta?.score}
           />
         );
       })}

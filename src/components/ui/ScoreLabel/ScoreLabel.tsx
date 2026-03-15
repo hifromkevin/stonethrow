@@ -1,21 +1,21 @@
 import {
-  getScoreLabel,
+  getRankLabel,
   SCORE_LABEL_STYLES,
   type ScoreLabelInfo,
 } from '@/lib/scoring/score-labels';
 
 type ScoreLabelProps = {
-  score: number;
+  rank: number;
   size?: 'sm' | 'md';
 };
 
 /**
- * Displays a score as a label without showing raw numbers.
- * "Top Match" items with score 85+ get a filled star indicator.
- * "Top Match" items with score 75-84 get a half-filled star indicator.
+ * Displays a rank-based match label.
+ * Rank 1 → "Top Match" (filled star), 2–4 → "Strong Match", 5–7 → "Good Match", 8+ → nothing.
  */
-const ScoreLabel = ({ score, size = 'sm' }: ScoreLabelProps) => {
-  const labelInfo = getScoreLabel(score);
+const ScoreLabel = ({ rank, size = 'sm' }: ScoreLabelProps) => {
+  const labelInfo = getRankLabel(rank);
+  if (!labelInfo) return null;
   const styles = SCORE_LABEL_STYLES[labelInfo.category];
 
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm';

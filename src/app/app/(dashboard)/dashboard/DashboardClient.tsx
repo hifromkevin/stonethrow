@@ -20,10 +20,7 @@ import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
 import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
 
 import useDeletePebble from '@/lib/mutations/useDeletePebble';
-import {
-  needsCoachHint,
-  needsBackgroundHint,
-} from '@/lib/scoring/score-labels';
+import { needsBackgroundHint } from '@/lib/scoring/score-labels';
 
 import { FocusState } from '@/types';
 
@@ -80,9 +77,8 @@ const DashboardClient = () => {
   const primaryExplanation = focusId
     ? displayRankedData?.primary?.explanation
     : undefined;
-  const primaryScore = focusId
-    ? displayRankedData?.primary?.final_score
-    : undefined;
+  // Rank 1 = primary pebble (always, when a focus is active)
+  const primaryRank = focusId ? 1 : undefined;
 
   const fullFocused = focusId ? (displayRankedData?.focused ?? []) : [];
   const focusedRanked = fullFocused.slice(0, 7);
@@ -92,14 +88,15 @@ const DashboardClient = () => {
     ? focusedRanked.map((r) => r.pebble)
     : flatPebbles.slice(1, 8);
 
+  // focusedRanked[0] = rank 2, [1] = rank 3, …, [6] = rank 8 (no badge)
   const focusedBadgesMap = focusId
     ? new Map(
-        focusedRanked.map((r) => [
+        focusedRanked.map((r, i) => [
           r.pebble.id,
           {
             badges: r.badges,
             explanation: r.explanation,
-            score: r.final_score,
+            rank: i + 2,
           },
         ])
       )
@@ -111,6 +108,7 @@ const DashboardClient = () => {
       )
     : flatPebbles.slice(8);
 
+  // Other pebbles get no rank badge — just pass explanation for the tooltip
   const otherBadgesMap = focusId
     ? new Map([
         ...remainingFocused.map(
@@ -120,7 +118,6 @@ const DashboardClient = () => {
               {
                 badges: r.badges,
                 explanation: r.explanation,
-                score: r.final_score,
               },
             ] as const
         ),
@@ -131,7 +128,6 @@ const DashboardClient = () => {
               {
                 badges: r.badges,
                 explanation: r.explanation,
-                score: r.final_score,
               },
             ] as const
         ),
@@ -148,18 +144,6 @@ const DashboardClient = () => {
 
   const isScoring = rankedData?.scoringStatus?.isScoring ?? false;
   const scoringStuck = rankedData?.scoringStatus?.scoringStuck ?? false;
-
-  // Collect all final scores to determine if coach hint should show
-  const allScores = useMemo(() => {
-    if (!focusId || !displayRankedData) return [];
-    const scores: number[] = [];
-    if (displayRankedData.primary?.final_score !== undefined) {
-      scores.push(displayRankedData.primary.final_score);
-    }
-    displayRankedData.focused?.forEach((r) => scores.push(r.final_score));
-    displayRankedData.other?.forEach((r) => scores.push(r.final_score));
-    return scores;
-  }, [focusId, displayRankedData]);
 
   // Collect focus sub-scores to detect when difficulty is the bottleneck
   const allSubScores = useMemo(() => {
@@ -194,13 +178,13 @@ const DashboardClient = () => {
     allSubScores.length > 0 &&
     needsBackgroundHint(allSubScores);
 
+  // Fire as soon as pebbles are rendered — the coach hint fetches in the background
+  // and fades in when ready, so no need to wait for enrichment or score thresholds.
   const showCoachHint =
     !showBackgroundHint &&
     focusId &&
     focus?.statement &&
-    !isScoring &&
-    allScores.length > 0 &&
-    needsCoachHint(allScores);
+    hasPebbles;
 
   useEffect(() => {
     if (!isScoring) {
@@ -246,8 +230,9 @@ const DashboardClient = () => {
           </CenteredComponent>
         )}
 
-        {/* Loading indicator - shown above pebbles */}
-        {isScoring && (
+        {/* Loading indicator - shown only while waiting for initial ranked pebbles.
+            Enrichment (badges/explanations) fills in silently once pebbles are visible. */}
+        {isScoring && !hasPebbles && (
           <CenteredComponent ariaLabel="scoring-loader">
             <div className="mx-auto flex max-w-2xl flex-col items-center py-6">
               <div className="mb-3 h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
@@ -300,7 +285,7 @@ const DashboardClient = () => {
                     onDelete={onDelete}
                     badges={primaryBadges}
                     explanation={primaryExplanation}
-                    score={primaryScore}
+                    rank={primaryRank}
                     isScoring={isScoring}
                   />
                 </CenteredComponent>
