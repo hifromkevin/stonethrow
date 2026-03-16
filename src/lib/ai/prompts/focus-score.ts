@@ -14,7 +14,11 @@ Also per pebble:
   Neutral: "Time Investment", "Advanced", "Reference Material", "Save for Later", "Paywalled"
   Negative: "Clickbait", "Off Focus", "Low Signal"
   Rules: "Off Focus" if focus_relevance<0.3; "Paywalled" only if marked paywalled; "Quick Win" if content_score is high and contextual_readiness is high; badges must be supported by scores.
-- explanation: One sentence on how this pebble relates (or doesn't) to the focus
+- explanation: Write this LAST, after you have scored every pebble in the set. With the full ranking in front of you, write one sentence per pebble that explains its position relative to the others — not just how it relates to the focus in isolation.
+  - Highest-scoring pebble: explain what makes it THE most directly relevant resource for this focus.
+  - Mid-range pebbles: acknowledge strong relevance and briefly note what separates them from the top (e.g., "Highly relevant case study, though less specific to your exact stage than the top result").
+  - Lower-scoring pebbles: acknowledge relevance but explicitly name what makes the higher-ranked items better — more specific, more actionable, more targeted (e.g., "Solid foundational advice on customer acquisition — ranked lower because it covers broader strategy rather than the specific solo SaaS tactics in the top results").
+  Tone: helpful and informative, not dismissive. A lower-ranked item is still worth having — the user should read the reason and think "that makes sense why it's fourth and not first."
 - confidence (0-1): Your confidence in these scores
 - evidence: Brief supporting evidence from the title, description, or domain
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { CheckCircle, Lightbulb, UserCircle } from 'lucide-react';
+import { Lightbulb, UserCircle } from 'lucide-react';
 import type { Pebble } from '@/types/pebble';
 import type { CoachHintResponse } from '@/lib/ai/coaching/coach-hint';
 
@@ -139,23 +139,7 @@ const CoachHint = (props: CoachHintProps) => {
   const fadeClasses = `transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`;
 
   if (hint.is_strong_collection) {
-    return (
-      <div className={`mx-auto my-6 max-w-2xl ${fadeClasses}`}>
-        <div className="rounded-xl border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 shadow-sm">
-          <div className="flex items-start gap-3">
-            <div className="rounded-lg bg-green-100 p-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <h3 className="font-semibold text-green-900">
-                Your collection looks strong for this focus
-              </h3>
-              <p className="mt-1 text-sm text-green-700">{hint.acknowledgment}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (

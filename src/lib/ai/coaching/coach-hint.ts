@@ -28,6 +28,10 @@ If there is a GENUINE GAP:
 - Name the type of content that's actually missing (be precise, not generic)
 - Suggest 2-3 specific topics to look for
 
+The bar for specificity is high. The acknowledgment should name what they DO have and what's actually missing, not just signal that the collection is weak.
+BAD: "Your collection could be stronger for this focus."
+GOOD: "You have solid general startup advice, but you're missing hands-on monetization tactics — look for case studies from founders who crossed their first $100–500 in revenue."
+
 Respond with JSON only:
 {
   "is_strong_collection": true,
