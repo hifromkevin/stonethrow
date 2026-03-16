@@ -43,7 +43,7 @@ const FocusedPebbleRow = ({
 
   return (
     <article className="group grid grid-cols-[auto_1fr_auto] items-center gap-2 overflow-hidden bg-white hover:bg-slate-50">
-      <figure className="aspect-square w-22 shrink-0 overflow-hidden">
+      <figure className="aspect-square w-14 shrink-0 overflow-hidden">
         <img
           src={pebble?.image_url}
           alt={pebble?.description || pebble?.title || 'Pebble Image'}
@@ -53,8 +53,8 @@ const FocusedPebbleRow = ({
 
       <div className="min-w-0">
         <div className="flex items-center justify-between gap-4">
-          <div className="min-w-0 py-2">
-            <p className="truncate text-base font-semibold text-slate-600">
+          <div className="min-w-0 py-1.5">
+            <p className="truncate text-sm font-semibold text-slate-600">
               <a
                 href={pebble?.canonical_url}
                 target="_blank"

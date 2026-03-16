@@ -32,7 +32,7 @@ const PrimaryFocusPebble = ({
   rank?: number;
   isScoring?: boolean;
 }) => (
-  <div className="mx-auto my-10 w-full max-w-2xl">
+  <div className="mx-auto mt-10 mb-20 w-full max-w-2xl">
     <LocalHeading label="If you only do one thing today..." bigger />
 
     <div className="rounded-2xl border border-gray-100 bg-white/90 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur">

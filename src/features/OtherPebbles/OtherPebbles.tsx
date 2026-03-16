@@ -13,7 +13,7 @@ const OtherPebbles = ({
   onDelete: (pebbleId: string) => void;
   badgesMap?: Map<string, { badges: Badge[]; explanation?: string; score?: number }>;
 }) => (
-  <NarrowComponent adtlStyles="my-8 opacity-40 hover:opacity-100 transition-opacity duration-300">
+  <NarrowComponent adtlStyles="my-8">
     <LocalHeading label="Other Pebbles" />
     <div className="mt-3 divide-y divide-slate-100 border border-slate-200">
       {pebbles?.map((pebble: Pebble, idx: number) => {
