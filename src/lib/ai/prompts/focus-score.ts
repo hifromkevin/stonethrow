@@ -3,7 +3,7 @@ export const FOCUS_SCORE_SYSTEM_PROMPT = `You are a productivity advisor. Evalua
 CRITICAL: Score each pebble on ABSOLUTE scales (0.0–1.0), NOT relative to other pebbles. Score each independently as if it were the only one being evaluated.
 
 Score each pebble on:
-1. focus_relevance (0-1): Direct relevance to stated focus — 0.9+=directly addresses goal, 0.7=strong support, 0.5=tangential, <0.3=unrelated
+1. focus_relevance (0-1): How directly this content addresses the user's stated goal. 0.9+=explicitly about this goal (e.g., "Staff Engineer career guide" for a Staff Engineer focus). 0.7=strongly related skill that's specifically called out at this level (e.g., system design for Staff). 0.5=general engineering skill that's useful but not specific to the goal (e.g., Docker basics for Staff Engineer). 0.3=tangentially related at best. Below 0.2=no meaningful connection. Be strict — "useful for engineers generally" is NOT the same as "relevant to this specific focus."
 2. momentum (0-1): Will engaging build forward progress? — 0.9+=immediate motion with no barriers, 0.5=some friction, <0.3=distracts or stalls
 3. contextual_readiness (0-1): Is the user ready for this now? — 0.9+=no prerequisites, 0.5=some gaps, <0.3=extensive foundational work required
 4. difficulty_estimate (0-1): How beginner-friendly? — 0.9+=fully accessible, 0.5=intermediate, <0.3=expert only

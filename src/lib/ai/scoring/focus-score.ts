@@ -70,18 +70,38 @@ type PebbleInput = {
   content_category?: ContentCategory;
 };
 
-const assignBucket = (
-  score: FocusScore & { pebble_id: string; focus_id: string },
-  rank: number,
-  contentCategory: ContentCategory | undefined
-): 'primary' | 'focused' | 'collection' | 'other' => {
-  if (rank === 0) return 'primary';
-  if (score.final_score >= 70) return 'focused';
-  if (score.focus_relevance < 0.4) {
-    if (contentCategory === 'entertainment') return 'collection';
-    if (contentCategory === 'commercial') return 'other';
+/**
+ * Assign buckets to a fully sorted (descending final_score) array of scores.
+ *
+ * Rules:
+ * 1. Rank-based: rank 1 → primary, ranks 2–ceil(n*0.15) → focused, rest → other.
+ * 2. Relevance gate: if focus_relevance < 0.65, cap at 'other' regardless of rank.
+ * 3. If NO pebble has focus_relevance >= 0.65, all buckets become 'other' — no
+ *    Top/Strong badges shown at all, keeping labels consistent with coaching hints.
+ */
+const assignBuckets = (
+  scores: Array<FocusScore & { pebble_id: string; focus_id: string }>
+): void => {
+  const total = scores.length;
+  const focusedCutoff = Math.ceil(total * 0.15); // upper bound (exclusive) for 'focused' tier
+  const hasAnyRelevant = scores.some((s) => s.focus_relevance >= 0.65);
+
+  for (let i = 0; i < total; i++) {
+    const score = scores[i];
+
+    if (!hasAnyRelevant || score.focus_relevance < 0.65) {
+      score.bucket = 'other';
+      continue;
+    }
+
+    if (i === 0) {
+      score.bucket = 'primary';
+    } else if (i < focusedCutoff) {
+      score.bucket = 'focused';
+    } else {
+      score.bucket = 'other';
+    }
   }
-  return 'other';
 };
 
 async function persistFocusScores(
@@ -152,16 +172,7 @@ const processLLMScores = (
   // Assign buckets
   if (focusScores.length > 0) {
     focusScores.sort((a, b) => b.final_score - a.final_score);
-    for (let i = 0; i < focusScores.length; i++) {
-      const pebbleInput = pebbleInputs.find(
-        (p) => p.id === focusScores[i].pebble_id
-      );
-      focusScores[i].bucket = assignBucket(
-        focusScores[i],
-        i,
-        pebbleInput?.content_category
-      );
-    }
+    assignBuckets(focusScores);
   }
 
   return focusScores;
@@ -387,16 +398,7 @@ export async function scoreFocusBatch(
   // Assign buckets across ALL scores
   if (allFocusScores.length > 0) {
     allFocusScores.sort((a, b) => b.final_score - a.final_score);
-    for (let i = 0; i < allFocusScores.length; i++) {
-      const pebbleInput = pebbleInputs.find(
-        (p) => p.id === allFocusScores[i].pebble_id
-      );
-      allFocusScores[i].bucket = assignBucket(
-        allFocusScores[i],
-        i,
-        pebbleInput?.content_category
-      );
-    }
+    assignBuckets(allFocusScores);
   }
 
   // Persist all scores
@@ -445,10 +447,11 @@ export async function scoreFocusSingle(
 
   const focusScores = processLLMScores(llmResponse, [pebbleInput], focusId);
 
-  // For a single pebble, override 'primary' — it'll compete for that slot at query time
+  // For a single pebble there's no rank context, so apply the relevance gate only.
+  // It will compete for the primary slot at query time via embedding rank.
   if (focusScores.length > 0) {
     const score = focusScores[0];
-    score.bucket = assignBucket(score, 1, pebbleInput.content_category);
+    score.bucket = score.focus_relevance >= 0.65 ? 'focused' : 'other';
   }
 
   await persistFocusScores(focusScores);
