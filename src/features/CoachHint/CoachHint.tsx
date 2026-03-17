@@ -45,6 +45,7 @@ const CoachHint = (props: CoachHintProps) => {
       lastFocusStatement.current = props.focusStatement;
       setHint(null);
       setIsVisible(false);
+      setBillingError(false);
     }
 
     if (hasFetched.current) return;
@@ -126,8 +127,20 @@ const CoachHint = (props: CoachHintProps) => {
   if (billingError) {
     return (
       <div className="mx-auto my-6 max-w-2xl">
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          AI credits are too low to generate suggestions. Add credits to restore this feature.
+        <div className="flex items-center justify-between gap-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <span>
+            AI credits are too low to generate suggestions. Add credits to
+            restore this feature.
+          </span>
+          <button
+            onClick={() => {
+              setBillingError(false);
+              hasFetched.current = false;
+            }}
+            className="shrink-0 rounded-md border border-red-300 bg-white px-3 py-1 text-xs font-medium text-red-700 hover:bg-red-50 active:bg-red-100"
+          >
+            Try again
+          </button>
         </div>
       </div>
     );
@@ -167,7 +180,7 @@ const CoachHint = (props: CoachHintProps) => {
 
           {hint.suggestions.length > 0 && (
             <div className="mt-3">
-              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-amber-600">
+              <p className="mb-2 text-xs font-medium tracking-wide text-amber-600 uppercase">
                 Try adding content about:
               </p>
               <ul className="space-y-1.5">
