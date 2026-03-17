@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Afacad, Inter } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/next';
 
 import Providers from './providers';
 
@@ -29,6 +30,7 @@ export default function RootLayout({
     <html className={` ${afacad.variable} ${inter.variable}`} lang="en">
       <body className={`antialiased`}>
         <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   );
