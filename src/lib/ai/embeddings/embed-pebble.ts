@@ -69,6 +69,53 @@ export async function embedPebble(pebble: PebbleForEmbedding): Promise<void> {
 }
 
 /**
+ * Backfill embeddings for a user's pebbles that are missing embeddings.
+ * Safe to call at any time — skips pebbles that already have embeddings.
+ */
+export async function backfillUserEmbeddings(userId: string): Promise<void> {
+  const supabase = await createClient();
+
+  // Only fetch pebbles that don't have an embedding yet
+  const { data: pebbles, error } = await supabase
+    .from('pebbles')
+    .select('id, title, description, domain, pebble_embeddings(pebble_id)')
+    .eq('user_id', userId)
+    .order('created_at');
+
+  if (error) {
+    console.error('Failed to fetch pebbles for embedding backfill:', error);
+    throw error;
+  }
+
+  const missing = (pebbles ?? []).filter(
+    (p: any) => !p.pebble_embeddings || p.pebble_embeddings.length === 0
+  );
+
+  if (missing.length === 0) {
+    console.log('No pebbles missing embeddings for user', userId);
+    return;
+  }
+
+  console.log(`Backfilling embeddings for ${missing.length} pebbles...`);
+  let succeeded = 0;
+  let failed = 0;
+
+  for (const pebble of missing) {
+    try {
+      await embedPebble(pebble);
+      succeeded++;
+    } catch (err) {
+      console.error(`Failed to embed pebble ${pebble.id}:`, err);
+      failed++;
+    }
+  }
+
+  console.log(
+    `Embedding backfill complete: ${succeeded} succeeded, ${failed} failed`
+  );
+}
+
+/**
  * Backfill embeddings for existing pebbles.
  * Run this once to generate embeddings for all pebbles already in the system.
  */

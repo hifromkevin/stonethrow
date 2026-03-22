@@ -222,11 +222,13 @@ export async function scoreFocusBatch(
   }));
 
   // pre-filter based on quality and category
+  // Note: 'commercial' is intentionally NOT excluded — users may deliberately save
+  // booking pages, listings, or product pages (e.g. Airbnb, hotels, restaurants)
+  // that are highly relevant to their focus (e.g. trip planning). Let the LLM score them.
   const pebblesToScore = pebbleInputs.filter(
     (p) =>
       (p.content_score ?? 0) >= 0.3 &&
-      p.content_category !== 'entertainment' &&
-      p.content_category !== 'commercial'
+      p.content_category !== 'entertainment'
   );
   const skippedPebbles = pebbleInputs.filter(
     (p) => !pebblesToScore.includes(p)
@@ -381,7 +383,7 @@ export async function scoreFocusBatch(
         final_score: 10,
         badges: [],
         explanation:
-          'Filtered out — content quality too low or not actionable.',
+          'Filtered out — content quality too low.',
         bucket: 'other' as const,
         confidence: 0.3,
         evidence: '',

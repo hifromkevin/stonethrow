@@ -237,15 +237,9 @@ export async function getRankedPebbles(
           // High similarity (50%+) even without Haiku enrichment
           bucket = 'focused';
         } else if (rank.similarity < 0.3) {
-          // Low similarity - check content category for collection/other
+          // Low similarity - entertainment goes to collection, everything else to other
           const contentCategory = contentScore?.content_category;
-          if (contentCategory === 'entertainment') {
-            bucket = 'collection';
-          } else if (contentCategory === 'commercial') {
-            bucket = 'other';
-          } else {
-            bucket = 'other';
-          }
+          bucket = contentCategory === 'entertainment' ? 'collection' : 'other';
         } else {
           bucket = 'other';
         }
