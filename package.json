@@ -25,6 +25,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "vite": "^7.0.0",
+    "voyageai": "^0.2.1",
     "youtube-transcript": "^1.2.1"
   },
   "devDependencies": {
