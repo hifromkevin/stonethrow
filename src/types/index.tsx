@@ -31,3 +31,4 @@ export type {
   RankedPebblesResponse,
   ScoringStatus,
 } from '@/types/scoring';
+export type { CoachHintResponse } from '@/types/coachesHint';

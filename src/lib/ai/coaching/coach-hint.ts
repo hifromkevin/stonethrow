@@ -1,13 +1,7 @@
 import { callLLM } from '@/lib/ai/callLLM';
 import { MODELS } from '@/lib/ai/client';
 import type { Pebble } from '@/types/pebble';
-
-export type CoachHintResponse = {
-  is_strong_collection: boolean;
-  acknowledgment: string;
-  missing_content_type?: string;
-  suggestions: string[];
-};
+import type { CoachHintResponse } from '@/types/coachesHint';
 
 const SYSTEM_PROMPT = `You are a supportive content coach helping users make progress on their current focus.
 
@@ -48,7 +42,7 @@ If there is a GENUINE GAP in the on-topic content (not a nice-to-have):
   "suggestions": ["Specific topic 1", "Specific topic 2"]
 }`;
 
-function buildUserPrompt(
+const buildUserPrompt = (
   focusStatement: string,
   pebbles: Array<{
     title: string;
@@ -58,7 +52,7 @@ function buildUserPrompt(
     badges?: string[];
     final_score?: number;
   }>
-): string {
+): string => {
   // Sort by score descending so the coach sees the strongest content first
   const sorted = [...pebbles].sort(
     (a, b) => (b.final_score ?? 0) - (a.final_score ?? 0)
@@ -91,9 +85,9 @@ Top scored content:
 ${pebbleSummaries || '(No content saved yet)'}
 
 The collection may also contain off-topic items (scored as "Other") — these belong to other focuses and should be ignored in your evaluation. Focus only on whether the top-scored content is sufficient for this focus, or whether there is a genuine gap in on-topic coverage.`;
-}
+};
 
-function bucketToLabel(bucket?: string): string {
+const bucketToLabel = (bucket?: string): string => {
   switch (bucket) {
     case 'primary':
       return 'Top Match';
@@ -104,12 +98,12 @@ function bucketToLabel(bucket?: string): string {
     default:
       return 'Unscored';
   }
-}
+};
 
-export async function generateCoachHint(
+const generateCoachHint = async (
   focusStatement: string,
   pebbles: Pebble[]
-): Promise<CoachHintResponse> {
+): Promise<CoachHintResponse> => {
   const pebbleSummaries = pebbles.map((p) => ({
     title: p.title,
     domain: p.domain ?? '',
@@ -128,4 +122,6 @@ export async function generateCoachHint(
     userPrompt,
     maxTokens: 512,
   });
-}
+};
+
+export default generateCoachHint;
