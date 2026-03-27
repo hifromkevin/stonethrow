@@ -1,8 +1,49 @@
-const MarketingPage = () => {
+import { headers } from 'next/headers';
+
+async function getAppUrlFromRequest(): Promise<string> {
+  const h = await headers();
+
+  const host =
+    h.get('x-forwarded-host') ??
+    h.get('host') ??
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/^https?:\/\//, '') ??
+    '';
+
+  const proto =
+    h.get('x-forwarded-proto') ??
+    (process.env.NODE_ENV === 'production' ? 'https' : 'http');
+
+  if (!host) return 'http://app.localhost:3000';
+
+  const [hostname, port] = host.split(':');
+  const portSuffix = port ? `:${port}` : '';
+
+  // If you’re already on the app subdomain, keep it as-is.
+  if (hostname === 'app.localhost' || hostname === 'app.stonethrow.io') {
+    return `${proto}://${hostname}${portSuffix}`;
+  }
+
+  // Local dev: `localhost:3001` -> `app.localhost:3001`
+  if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    return `${proto}://app.localhost${portSuffix}`;
+  }
+
+  // Production / staging:
+  // Your app lives on a canonical host (`app.stonethrow.io`) regardless of
+  // which marketing domain you land on (`stonethrow.io`, `getstonethrow.com`, etc).
+  //
+  // If you ever need a different target, use NEXT_PUBLIC_APP_URL to override.
+  if (process.env.NODE_ENV === 'production') {
+    return `${proto}://app.stonethrow.io${portSuffix}`;
+  }
+
+  // Fallback for any other non-local hostname during dev.
+  return `${proto}://app.localhost${portSuffix}`;
+}
+
+const MarketingPage = async () => {
   const appUrl =
-    process.env.NODE_ENV === 'production'
-      ? 'https://app.stonethrow.io'
-      : 'http://app.localhost:3000';
+    process.env.NEXT_PUBLIC_APP_URL ?? (await getAppUrlFromRequest());
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-slate-50 to-slate-100">
