@@ -1,4 +1,4 @@
-export const FOCUS_SCORE_SYSTEM_PROMPT = `You are a productivity advisor. Evaluate how well saved links (pebbles) align with a user's focus statement.
+const FOCUS_SCORE_SYSTEM_PROMPT = `You are a productivity advisor. Evaluate how well saved links (pebbles) align with a user's focus statement.
 
 CRITICAL: Score each pebble on ABSOLUTE scales (0.0–1.0), NOT relative to other pebbles. Score each independently as if it were the only one being evaluated.
 
@@ -25,7 +25,7 @@ Also per pebble:
 Return ALL pebbles with exact IDs. Respond with ONLY JSON:
 {"scores":[{"pebble_id":"id","focus_relevance":0.0,"momentum":0.0,"contextual_readiness":0.0,"difficulty_estimate":0.0,"badges":[],"explanation":"...","confidence":0.0,"evidence":"..."}]}`;
 
-export function buildFocusScoreUserPrompt(
+const buildFocusScoreUserPrompt = (
   focusStatement: string,
   pebbles: Array<{
     id: string;
@@ -35,7 +35,7 @@ export function buildFocusScoreUserPrompt(
     paywalled: boolean;
     content_score?: number;
   }>
-): string {
+): string => {
   const pebbleSummaries = pebbles.map((p, i) =>
     [
       `--- Pebble ${i + 1} (ID: ${p.id}) ---`,
@@ -54,4 +54,6 @@ export function buildFocusScoreUserPrompt(
     '',
     ...pebbleSummaries,
   ].join('\n');
-}
+};
+
+export { FOCUS_SCORE_SYSTEM_PROMPT, buildFocusScoreUserPrompt};

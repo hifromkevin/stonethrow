@@ -1,6 +1,6 @@
 import anthropic, { type ModelVersion } from '@/lib/ai/client';
 import { AIError, classifyAIError } from '@/lib/ai/errors';
-import { parseLLMJSON } from '@/lib/ai/parseJSON';
+import parseLLMJSON from '@/lib/ai/parseJSON';
 
 type CallLLMOptions = {
   model: ModelVersion;

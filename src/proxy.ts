@@ -4,11 +4,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 // Hostnames for the app subdomain
 const APP_SUBDOMAIN_PATTERNS = ['app.stonethrow.io', 'app.localhost'];
 
-function isAppSubdomain(hostname: string): boolean {
-  return APP_SUBDOMAIN_PATTERNS.some(
+const isAppSubdomain = (hostname: string): boolean =>
+  APP_SUBDOMAIN_PATTERNS.some(
     (pattern) => hostname === pattern || hostname.startsWith(pattern + ':') // handles app.localhost:3000
   );
-}
 
 const proxy = async (request: NextRequest) => {
   const hostname = request.headers.get('host') || '';

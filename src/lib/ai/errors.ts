@@ -43,7 +43,7 @@ export class AIError extends Error {
 /**
  * Classify an error from the Anthropic SDK into a typed AIError.
  */
-export function classifyAIError(err: unknown): AIError {
+const classifyAIError = (err: unknown): AIError => {
   if (err instanceof AIError) {
     return err;
   }
@@ -141,20 +141,22 @@ export function classifyAIError(err: unknown): AIError {
     retryable: false,
     cause: err instanceof Error ? err : undefined,
   });
-}
+};
 
 /**
  * Check if an error should trigger a retry.
  */
-export function isRetryableError(err: unknown): boolean {
+const isRetryableError = (err: unknown): boolean => {
   const aiError = classifyAIError(err);
   return aiError.retryable;
-}
+};
 
 /**
  * Get a user-friendly error message.
  */
-export function getErrorMessage(err: unknown): string {
+const getErrorMessage = (err: unknown): string => {
   const aiError = classifyAIError(err);
   return aiError.message;
-}
+};
+
+export { classifyAIError, isRetryableError, getErrorMessage };

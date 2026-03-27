@@ -27,13 +27,13 @@ Respond with ONLY a JSON object, no other text:
   "evidence": "..."
 }`;
 
-export function buildContentScoreUserPrompt(pebble: {
+const buildContentScoreUserPrompt = (pebble: {
   title: string | null;
   description: string | null;
   domain: string | null;
   raw_text: string | null;
   paywalled: boolean;
-}): string {
+}): string => {
   return [
     `Title: ${pebble.title ?? 'Unknown'}`,
     `Domain: ${pebble.domain ?? 'Unknown'}`,
@@ -41,4 +41,6 @@ export function buildContentScoreUserPrompt(pebble: {
     `Paywalled: ${pebble.paywalled ? 'Yes (content may be incomplete)' : 'No'}`,
     `Content:\n${pebble.raw_text?.slice(0, 3000) ?? 'No content available'}`,
   ].join('\n');
-}
+};
+
+export default buildContentScoreUserPrompt;

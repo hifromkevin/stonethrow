@@ -6,9 +6,9 @@ import {
 } from '@/lib/ai/prompts/focus-validate';
 import type { FocusSafetyResult } from '@/types/scoring';
 
-export async function validateFocusSafety(
+const validateFocusSafety = async (
   statement: string
-): Promise<FocusSafetyResult> {
+): Promise<FocusSafetyResult> => {
   // Quick pre-checks (no LLM needed)
   if (!statement || statement.trim().length < 3) {
     return {
@@ -46,4 +46,6 @@ export async function validateFocusSafety(
     // Fail open: if safety check fails, allow the focus
     return { is_safe: true };
   }
-}
+};
+
+export default validateFocusSafety;

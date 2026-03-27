@@ -2,7 +2,7 @@
  * Parse JSON from LLM response with fallback strategies.
  * Handles: direct JSON, markdown code blocks, embedded JSON in text.
  */
-export function parseLLMJSON<T>(raw: string): T {
+const parseLLMJSON = <T>(raw: string): T => {
   // Try direct parse
   try {
     return JSON.parse(raw);
@@ -31,4 +31,6 @@ export function parseLLMJSON<T>(raw: string): T {
   }
 
   throw new Error(`Failed to parse LLM JSON response: ${raw.slice(0, 200)}`);
-}
+  };
+
+export default parseLLMJSON;

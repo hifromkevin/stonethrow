@@ -28,7 +28,7 @@ export async function matchPebblesByEmbedding(
     query_embedding: embedding,
     match_user_id: userId,
     match_threshold: 0.2,
-    match_count: 200,
+    match_count: 500,
   });
   const rpcElapsed = Date.now() - rpcStartTime;
   console.log(`[EMBEDDING_TIMING] match_pebbles RPC: ${rpcElapsed}ms`);
