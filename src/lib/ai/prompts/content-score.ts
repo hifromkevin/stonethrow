@@ -1,4 +1,4 @@
-export const CONTENT_SCORE_SYSTEM_PROMPT = `You are a content quality analyst. You evaluate web content for practical value and signal quality.
+const CONTENT_SCORE_SYSTEM_PROMPT = `You are a content quality analyst. You evaluate web content for practical value and signal quality.
 
 You will receive a pebble (saved link) with its title, description, domain, and raw text content.
 
@@ -43,4 +43,4 @@ const buildContentScoreUserPrompt = (pebble: {
   ].join('\n');
 };
 
-export default buildContentScoreUserPrompt;
+export { CONTENT_SCORE_SYSTEM_PROMPT, buildContentScoreUserPrompt };

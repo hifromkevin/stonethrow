@@ -1,7 +1,7 @@
 import { NextResponse, after } from 'next/server';
 import createClient from '@/lib/supabase/server';
 import { AIError } from '@/lib/ai/errors';
-import { validateFocusSafety } from '@/lib/ai/safety/focus-validator';
+import validateFocusSafety from '@/lib/ai/safety/focus-validator';
 import { scoreFocusBatch } from '@/lib/ai/scoring/focus-score';
 import {
   rankByEmbedding,
