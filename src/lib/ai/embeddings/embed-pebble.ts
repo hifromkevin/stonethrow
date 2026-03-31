@@ -104,6 +104,9 @@ export async function backfillUserEmbeddings(userId: string): Promise<void> {
     try {
       await embedPebble(pebble);
       succeeded++;
+      // Stay within Voyage AI's free-tier rate limit (3 RPM).
+      // Remove or reduce this delay once a paid plan is active.
+      await new Promise((r) => setTimeout(r, 20_000));
     } catch (err) {
       console.error(`Failed to embed pebble ${pebble.id}:`, err);
       failed++;

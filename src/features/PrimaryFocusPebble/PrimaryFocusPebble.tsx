@@ -1,5 +1,6 @@
 import LocalHeading from '@/components/layout/LocalHeading';
 import Button from '@/components/ui/Button';
+import EllipsisIcon from '@/components/ui/Ellipsis/EllipsisIcon';
 import ScoreLabel from '@/components/ui/ScoreLabel/ScoreLabel';
 import cleanTitle from '@/lib/urls/cleanTitle';
 import { Pebble } from '@/types/pebble';
@@ -55,6 +56,13 @@ const PrimaryFocusPebble = ({
           ({primaryFocusPebble?.domain || primaryFocusPebble?.canonical_url})
         </a>
         {rank !== undefined && <ScoreLabel rank={rank} />}
+        <div className="ml-auto">
+          <EllipsisIcon
+            url={primaryFocusPebble?.canonical_url}
+            onDelete={onDelete}
+            pebbleId={primaryFocusPebble.id}
+          />
+        </div>
       </div>
 
       {/* Content */}

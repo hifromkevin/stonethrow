@@ -5,6 +5,7 @@ import canonicalizeUrl from '@/lib/urls/canonicalizeUrl';
 import extractDomain from '@/lib/urls/extractDomain';
 import extractHtmlMetadata from '@/lib/urls/extractHtmlMetadata';
 import cleanTitle from '@/lib/urls/cleanTitle';
+import extractTitleFromUrl from '@/lib/urls/extractTitleFromUrl';
 
 import type { AddPebbleResult } from '@/types';
 
@@ -23,7 +24,7 @@ const addPebble = async (
       original_url: rawUrl,
       canonical_url: canonicalUrl,
       domain: extractDomain(rawUrl),
-      title: cleanTitle(meta?.title),
+      title: cleanTitle(meta?.title) || extractTitleFromUrl(rawUrl),
       image_url: meta?.image,
       image_source: meta?.imageSource,
       description: meta?.description,

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CircleQuestionMark } from 'lucide-react';
+import { CircleQuestionMark, Globe } from 'lucide-react';
 
 import EllipsisIcon from '@/components/ui/Ellipsis/EllipsisIcon';
 import ScoreLabel from '@/components/ui/ScoreLabel/ScoreLabel';
@@ -41,14 +41,23 @@ const FocusedPebbleRow = ({
     if (action === 'complete') onComplete(pebble.id);
   };
 
+  const displayTitle =
+    cleanTitle(pebble.title) || pebble.domain || pebble.canonical_url;
+
   return (
     <article className="group grid grid-cols-[auto_1fr_auto] items-center gap-2 overflow-hidden bg-white hover:bg-slate-50">
       <figure className="aspect-square w-14 shrink-0 overflow-hidden">
-        <img
-          src={pebble?.image_url}
-          alt={pebble?.description || pebble?.title || 'Pebble Image'}
-          className="h-full w-full object-cover"
-        />
+        {pebble.image_url ? (
+          <img
+            src={pebble.image_url}
+            alt={pebble.description || pebble.title || 'Pebble Image'}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-slate-100">
+            <Globe className="h-6 w-6 text-slate-400" />
+          </div>
+        )}
       </figure>
 
       <div className="min-w-0">
@@ -60,7 +69,7 @@ const FocusedPebbleRow = ({
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                {cleanTitle(pebble.title)}
+                {displayTitle}
               </a>
             </p>
 
