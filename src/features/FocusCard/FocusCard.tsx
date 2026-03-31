@@ -83,12 +83,6 @@ const FocusCard = ({
         )}
 
         <LocalHeading label="Current Focus" />
-
-        {!isCommitted && (
-          <Tooltip type="focus-card" side="right">
-            <CircleQuestionMark size={16} className="text-slate-500" />
-          </Tooltip>
-        )}
       </header>
       <Card className="relative pt-1">
         <div
@@ -133,7 +127,12 @@ const FocusCard = ({
 
               <p className="mt-2 text-sm text-slate-400">
                 Enter what's on your mind! Anything works, but clarity beats
-                perfection
+                perfection.{' '}
+                {
+                  <Tooltip type="focus-card" side="right">
+                    <CircleQuestionMark size={16} className="text-slate-500" />
+                  </Tooltip>
+                }
               </p>
 
               {safetyError && (
@@ -143,7 +142,9 @@ const FocusCard = ({
                   </p>
                   {safetyError.alternatives.length > 0 && (
                     <div className="mt-2">
-                      <p className="text-xs text-red-600">Try one of these instead:</p>
+                      <p className="text-xs text-red-600">
+                        Try one of these instead:
+                      </p>
                       <div className="mt-1 flex flex-wrap gap-2">
                         {safetyError.alternatives.map((alt) => (
                           <button
@@ -175,7 +176,9 @@ const FocusCard = ({
                   Cancel
                 </button>
                 <Button
-                  label={setFocusMutation.isPending ? 'Saving...' : 'Save Focus'}
+                  label={
+                    setFocusMutation.isPending ? 'Saving...' : 'Save Focus'
+                  }
                   type="button"
                   overrides="w-28"
                   clickFn={handleSave}
