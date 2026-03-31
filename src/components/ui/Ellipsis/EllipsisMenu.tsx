@@ -54,9 +54,12 @@ const EllipsisMenu = ({
           if (e.key === 'Escape') setIsOpen(false);
         }}
         onBlur={(e) => {
-          if (!menuRef.current?.contains(e.relatedTarget as Node)) {
-            setIsOpen(false);
-          }
+          const related = e.relatedTarget;
+          setTimeout(() => {
+            if (!menuRef.current?.contains(related as Node)) {
+              setIsOpen(false);
+            }
+          }, 0);
         }}
         style={
           rect
@@ -78,7 +81,7 @@ const EllipsisMenu = ({
           Go to link
         </a>
 
-        <button
+        {/* <button
           role="menuitem"
           onClick={() => {
             setIsOpen(false);
@@ -113,7 +116,7 @@ const EllipsisMenu = ({
           className="flex w-full items-center gap-3 px-4 py-2 hover:bg-slate-100"
         >
           Mark complete
-        </button>
+        </button> */}
 
         <button
           role="menuitem"
