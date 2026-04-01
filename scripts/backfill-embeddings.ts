@@ -1,12 +1,15 @@
 import 'dotenv/config';
 import { createClient } from '@supabase/supabase-js';
 import Anthropic from '@anthropic-ai/sdk';
-import embeddingClient, { EMBEDDING_MODEL, EMBEDDING_DIMENSION } from '@/lib/ai/embeddings/client';
+import embeddingClient, {
+  EMBEDDING_MODEL,
+  EMBEDDING_DIMENSION,
+} from '@/lib/ai/embeddings/client';
 import {
   CONTENT_SCORE_SYSTEM_PROMPT,
   buildContentScoreUserPrompt,
 } from '@/lib/ai/prompts/content-score';
-import { parseLLMJSON } from '@/lib/ai/parseJSON';
+import parseLLMJSON from '@/lib/ai/parseJSON';
 import type { ContentScoreLLMResponse } from '@/types/scoring';
 
 /**
@@ -32,7 +35,9 @@ async function main() {
   const claudeApiKey = process.env.CLAUDE_API_KEY;
 
   if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error('NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required');
+    throw new Error(
+      'NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are required'
+    );
   }
   if (!voyageApiKey) {
     throw new Error('VOYAGE_API_KEY is required');
@@ -62,10 +67,14 @@ async function main() {
   const { data: existingScores } = await supabase
     .from('pebble_content_scores')
     .select('pebble_id');
-  const alreadyScored = new Set((existingScores ?? []).map((r: any) => r.pebble_id));
+  const alreadyScored = new Set(
+    (existingScores ?? []).map((r: any) => r.pebble_id)
+  );
   const toScore = pebbles.filter((p: any) => !alreadyScored.has(p.id));
 
-  console.log(`Content scores: ${alreadyScored.size} already scored, ${toScore.length} to process.`);
+  console.log(
+    `Content scores: ${alreadyScored.size} already scored, ${toScore.length} to process.`
+  );
 
   let scoreSucceeded = 0;
   let scoreFailed = 0;
@@ -100,15 +109,17 @@ async function main() {
         WEIGHTS.time_relevance * metrics.time_relevance +
         WEIGHTS.effort_friction * metrics.effort_friction;
 
-      const { error: upsertError } = await supabase.from('pebble_content_scores').upsert(
-        {
-          pebble_id: pebble.id,
-          ...metrics,
-          content_score,
-          model_version: 'claude-haiku-4-5-20251001',
-        },
-        { onConflict: 'pebble_id' }
-      );
+      const { error: upsertError } = await supabase
+        .from('pebble_content_scores')
+        .upsert(
+          {
+            pebble_id: pebble.id,
+            ...metrics,
+            content_score,
+            model_version: 'claude-haiku-4-5-20251001',
+          },
+          { onConflict: 'pebble_id' }
+        );
 
       if (upsertError) throw new Error(upsertError.message);
 
@@ -118,23 +129,31 @@ async function main() {
       );
     } catch (err: any) {
       scoreFailed++;
-      console.error(`  ✗ score [${scoreSucceeded + scoreFailed}/${toScore.length}] ${pebble.id}: ${err.message}`);
+      console.error(
+        `  ✗ score [${scoreSucceeded + scoreFailed}/${toScore.length}] ${pebble.id}: ${err.message}`
+      );
     }
 
     // Small delay to respect Claude rate limits
     await new Promise((r) => setTimeout(r, 300));
   }
 
-  console.log(`\nContent scoring done: ${scoreSucceeded} succeeded, ${scoreFailed} failed.\n`);
+  console.log(
+    `\nContent scoring done: ${scoreSucceeded} succeeded, ${scoreFailed} failed.\n`
+  );
 
   // --- Phase 2: Embeddings ---
   const { data: existing } = await supabase
     .from('pebble_embeddings')
     .select('pebble_id');
-  const alreadyEmbedded = new Set((existing ?? []).map((r: any) => r.pebble_id));
+  const alreadyEmbedded = new Set(
+    (existing ?? []).map((r: any) => r.pebble_id)
+  );
   const toEmbed = pebbles.filter((p: any) => !alreadyEmbedded.has(p.id));
 
-  console.log(`Embeddings: ${alreadyEmbedded.size} already embedded, ${toEmbed.length} to process.`);
+  console.log(
+    `Embeddings: ${alreadyEmbedded.size} already embedded, ${toEmbed.length} to process.`
+  );
 
   let embedSucceeded = 0;
   let embedFailed = 0;
@@ -145,8 +164,11 @@ async function main() {
   let consecutiveRateLimits = 0;
 
   for (const pebble of toEmbed) {
-    const textParts = [pebble.title ?? '', pebble.domain ?? '', pebble.description ?? '']
-      .filter((s: string) => s.trim().length > 0);
+    const textParts = [
+      pebble.title ?? '',
+      pebble.domain ?? '',
+      pebble.description ?? '',
+    ].filter((s: string) => s.trim().length > 0);
 
     if (textParts.length === 0) {
       console.warn(`  Skipping ${pebble.id}: no text to embed`);
@@ -157,13 +179,17 @@ async function main() {
       const embedding = await embeddingClient.embedText(textParts.join(' | '));
 
       if (embedding.length !== EMBEDDING_DIMENSION) {
-        throw new Error(`Dimension mismatch: expected ${EMBEDDING_DIMENSION}, got ${embedding.length}`);
+        throw new Error(
+          `Dimension mismatch: expected ${EMBEDDING_DIMENSION}, got ${embedding.length}`
+        );
       }
 
-      const { error: upsertError } = await supabase.from('pebble_embeddings').upsert(
-        { pebble_id: pebble.id, embedding, model_version: EMBEDDING_MODEL },
-        { onConflict: 'pebble_id' }
-      );
+      const { error: upsertError } = await supabase
+        .from('pebble_embeddings')
+        .upsert(
+          { pebble_id: pebble.id, embedding, model_version: EMBEDDING_MODEL },
+          { onConflict: 'pebble_id' }
+        );
 
       if (upsertError) throw new Error(upsertError.message);
 
@@ -173,7 +199,8 @@ async function main() {
         `  ✓ embed [${embedSucceeded + embedFailed}/${toEmbed.length}] ${pebble.id} — "${pebble.title ?? '(no title)'}"`
       );
     } catch (err: any) {
-      const isRateLimit = err.code === 'RATE_LIMIT' || err.message?.includes('429');
+      const isRateLimit =
+        err.code === 'RATE_LIMIT' || err.message?.includes('429');
       if (isRateLimit) {
         consecutiveRateLimits++;
         embedFailed++;
@@ -183,12 +210,21 @@ async function main() {
         await new Promise((r) => setTimeout(r, RATE_LIMIT_COOLDOWN_MS));
         // Retry this pebble immediately after cooldown (re-insert at front by re-running inline)
         try {
-          const embedding = await embeddingClient.embedText(textParts.join(' | '));
-          if (embedding.length !== EMBEDDING_DIMENSION) throw new Error('Dimension mismatch after retry');
-          const { error: upsertError } = await supabase.from('pebble_embeddings').upsert(
-            { pebble_id: pebble.id, embedding, model_version: EMBEDDING_MODEL },
-            { onConflict: 'pebble_id' }
+          const embedding = await embeddingClient.embedText(
+            textParts.join(' | ')
           );
+          if (embedding.length !== EMBEDDING_DIMENSION)
+            throw new Error('Dimension mismatch after retry');
+          const { error: upsertError } = await supabase
+            .from('pebble_embeddings')
+            .upsert(
+              {
+                pebble_id: pebble.id,
+                embedding,
+                model_version: EMBEDDING_MODEL,
+              },
+              { onConflict: 'pebble_id' }
+            );
           if (upsertError) throw new Error(upsertError.message);
           embedFailed--;
           embedSucceeded++;
@@ -197,18 +233,24 @@ async function main() {
             `  ✓ embed [${embedSucceeded + embedFailed}/${toEmbed.length}] ${pebble.id} — "${pebble.title ?? '(no title)'}" (after cooldown)`
           );
         } catch (retryErr: any) {
-          console.error(`  ✗ embed [${embedSucceeded + embedFailed}/${toEmbed.length}] ${pebble.id}: ${retryErr.message}`);
+          console.error(
+            `  ✗ embed [${embedSucceeded + embedFailed}/${toEmbed.length}] ${pebble.id}: ${retryErr.message}`
+          );
         }
         continue;
       }
       embedFailed++;
-      console.error(`  ✗ embed [${embedSucceeded + embedFailed}/${toEmbed.length}] ${pebble.id}: ${err.message}`);
+      console.error(
+        `  ✗ embed [${embedSucceeded + embedFailed}/${toEmbed.length}] ${pebble.id}: ${err.message}`
+      );
     }
 
     await new Promise((r) => setTimeout(r, DELAY_MS));
   }
 
-  console.log(`\nEmbeddings done: ${embedSucceeded} succeeded, ${embedFailed} failed.\n`);
+  console.log(
+    `\nEmbeddings done: ${embedSucceeded} succeeded, ${embedFailed} failed.\n`
+  );
 
   // --- Final count check ---
   const { count: embeddingCount } = await supabase
@@ -218,11 +260,15 @@ async function main() {
     .from('pebbles')
     .select('*', { count: 'exact', head: true });
 
-  console.log(`Final counts: ${embeddingCount} embeddings / ${pebbleCount} pebbles`);
+  console.log(
+    `Final counts: ${embeddingCount} embeddings / ${pebbleCount} pebbles`
+  );
   if (embeddingCount === pebbleCount) {
     console.log('✓ All pebbles have embeddings.');
   } else {
-    console.warn(`⚠ Mismatch: ${pebbleCount! - embeddingCount!} pebbles still missing embeddings.`);
+    console.warn(
+      `⚠ Mismatch: ${pebbleCount! - embeddingCount!} pebbles still missing embeddings.`
+    );
   }
 }
 
