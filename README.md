@@ -4,41 +4,68 @@ Organize, prioritize, and act on your saved content — powered by AI.
 
 Stonethrow helps you tame information overload. Save links, YouTube videos, articles, screenshots, and notes — then let AI summarize, categorize, and rank what you should look at next.
 
-# Old Next.js
+## Core Concepts
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+- **Pebbles** — the atomic unit of saved content. A pebble can be a URL, YouTube video, article, or note. Stonethrow extracts metadata, transcripts, and page text automatically.
+- **Focus** — a statement of what you're currently trying to accomplish. The AI uses your focus to score and rank which pebbles are most relevant to you right now.
+- **Scoring** — pebbles are scored in the background using Claude (for relevance) and Voyage AI (for semantic similarity). The dashboard surfaces your highest-signal content first.
 
-## Getting Started
+## Stack
 
-First, run the development server:
+- **Framework**: Next.js (App Router)
+- **Database & Auth**: Supabase (PostgreSQL + Row Level Security)
+- **AI**: Anthropic Claude (relevance scoring, focus validation, coach hints)
+- **Embeddings**: Voyage AI (semantic similarity ranking)
+- **Hosting**: Vercel
+- **Analytics**: Vercel Analytics
+
+## Local Setup
+
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Set up environment variables
+
+Copy `.env.example` to `.env.local` and fill in the values:
+
+```bash
+cp .env.example .env.local
+```
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+CLAUDE_API_KEY=
+VOYAGE_API_KEY=
+```
+
+- **Supabase**: create a project at [supabase.com](https://supabase.com) and grab the project URL and anon key
+- **Claude**: get an API key from [console.anthropic.com](https://console.anthropic.com)
+- **Voyage AI**: get an API key from [voyageai.com](https://www.voyageai.com)
+
+### 3. Apply database migrations
+
+```bash
+npx supabase db push
+```
+
+Or apply migrations manually from `supabase/migrations/` in order.
+
+### 4. Run the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+The app routes traffic based on subdomain: `app.localhost` (or `app.stonethrow.io` in production) serves the dashboard; the root domain serves the marketing page.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment
 
-## Learn More
+Deploy to Vercel. Set the same environment variables from `.env.local` in your Vercel project settings.
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Make sure your Supabase project has the production URL added to the allowed redirect URLs for auth.
