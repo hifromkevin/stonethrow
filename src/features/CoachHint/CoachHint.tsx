@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Lightbulb, UserCircle } from 'lucide-react';
 import type { Pebble } from '@/types/pebble';
-import type { CoachHintResponse } from '@/lib/ai/coaching/coach-hint';
+import type { CoachHintResponse } from '@/types/coachesHint';
 
 type MissingPebblesProps = {
   variant?: 'missing-pebbles';
