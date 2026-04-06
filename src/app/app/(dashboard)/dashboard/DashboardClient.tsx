@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import usePebbles from '@/lib/queries/client/usePebbles';
 import useRankedPebbles from '@/lib/queries/client/useRankedPebbles';
 import useFocus from '@/lib/queries/useFocus';
@@ -34,6 +35,8 @@ const DashboardClient = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [focusStatus, setFocusStatus] = useState<FocusState>('empty');
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [isRescoring, setIsRescoring] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: focus } = useFocus();
   const focusId = focus?.id;
@@ -41,6 +44,8 @@ const DashboardClient = () => {
   // Use ranked pebbles when focus is active, flat list otherwise
   const { data: rankedData, isLoading: rankedLoading } =
     useRankedPebbles(focusId);
+
+  console.log('Ranked Data:', rankedData); // Debug log for ranked data
 
   // Preserve the last fully-scored snapshot so the list doesn't jump to
   // newest-to-oldest while re-scoring (all pebbles default to score 50).
@@ -181,10 +186,7 @@ const DashboardClient = () => {
   // Fire as soon as pebbles are rendered — the coach hint fetches in the background
   // and fades in when ready, so no need to wait for enrichment or score thresholds.
   const showCoachHint =
-    !showBackgroundHint &&
-    focusId &&
-    focus?.statement &&
-    hasPebbles;
+    !showBackgroundHint && focusId && focus?.statement && hasPebbles;
 
   useEffect(() => {
     if (!isScoring) {
@@ -198,6 +200,19 @@ const DashboardClient = () => {
 
     return () => clearInterval(interval);
   }, [isScoring]);
+
+  const handleRescore = async () => {
+    if (isRescoring) return;
+    setIsRescoring(true);
+    try {
+      await fetch('/api/rescore', { method: 'POST' });
+      await queryClient.invalidateQueries({
+        queryKey: ['pebbles', 'ranked', focusId],
+      });
+    } finally {
+      setIsRescoring(false);
+    }
+  };
 
   const deletePebble = useDeletePebble();
   const onDelete = (pebbleId: string) => {
@@ -291,7 +306,6 @@ const DashboardClient = () => {
                 </CenteredComponent>
               )}
 
-              {console.log('Focused Pebbles List:', focusedPebblesList)}
               {focusedPebblesList.length > 0 && (
                 <>
                   <CenteredComponent ariaLabel="focused-pebbles">
@@ -317,6 +331,20 @@ const DashboardClient = () => {
                     onDelete={onDelete}
                     badgesMap={otherBadgesMap}
                   />
+                </CenteredComponent>
+              )}
+
+              {focusId && (
+                <CenteredComponent ariaLabel="rescore">
+                  <div className="flex justify-center pb-4">
+                    <button
+                      onClick={handleRescore}
+                      disabled={isRescoring || isScoring}
+                      className="text-xs text-slate-400 hover:text-slate-600 disabled:opacity-40"
+                    >
+                      {isRescoring ? 'Re-scoring…' : 'Re-score pebbles'}
+                    </button>
+                  </div>
                 </CenteredComponent>
               )}
             </>

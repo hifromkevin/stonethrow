@@ -1,5 +1,9 @@
 @import 'tailwindcss';
 
+@theme inline {
+  --font-dm-serif: var(--font-dm-serif), serif;
+}
+
 @theme {
   /* Custom Colors */
   --color-testpink: #ff00ff;
@@ -24,6 +28,28 @@
       opacity: 0.55;
     }
   }
+
+  @keyframes floatUp {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes badge-pulse {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.4);
+    }
+  }
 }
 
 @layer base {
@@ -41,6 +67,19 @@
     font-size: 0.7rem;
     color: var(--color-slate-500);
   }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(24px);
+    transition:
+      opacity 0.7s ease,
+      transform 0.7s ease;
+  }
+
+  .fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @layer utilities {
@@ -51,5 +90,17 @@
 
   .animate-pulse-slow {
     animation: pulse-slow 3s ease-in-out infinite;
+  }
+
+  .animate-float-up {
+    animation: floatUp 6s ease-in-out infinite;
+  }
+
+  .animate-badge-pulse {
+    animation: badge-pulse 2.5s ease-in-out infinite;
+  }
+
+  .font-dm-serif {
+    font-family: var(--font-dm-serif), Georgia, serif;
   }
 }
