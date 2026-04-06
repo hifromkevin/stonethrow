@@ -1,0 +1,311 @@
+{
+  "info": {
+    "name": "Stonethrow",
+    "description": "API collection for Stonethrow — AI-powered content organization.\n\nSet the `baseUrl` variable to your environment:\n- Local: `http://app.localhost:3000`\n- Production: `https://app.stonethrow.io`\n\nAll endpoints require an authenticated Supabase session. Set the `cookie` header or configure a session token in the collection auth.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://app.localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Pebbles",
+      "item": [
+        {
+          "name": "Add pebble",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/pebbles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pebbles"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"https://example.com/article\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Save a new pebble by URL. Stonethrow extracts metadata, page text, and YouTube transcripts automatically.\n\nBackground tasks kick off after the response:\n- A1: Content quality scoring (Claude)\n- A2: Embedding generation (Voyage AI)\n- B: Focus scoring against active focus (if one exists)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"id\": \"uuid\",\n    \"url\": \"https://example.com/article\",\n    \"title\": \"Example Article\",\n    \"description\": \"...\",\n    \"created_at\": \"2026-03-31T00:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Unauthorized",
+              "status": "Internal Server Error",
+              "code": 500,
+              "body": "{\n  \"ok\": false,\n  \"error\": \"UNAUTHORIZED\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "List pebbles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pebbles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pebbles"],
+              "query": [
+                {
+                  "key": "ranked",
+                  "value": "true",
+                  "description": "Return pebbles ranked by relevance to active focus",
+                  "disabled": true
+                },
+                {
+                  "key": "focus_id",
+                  "value": "",
+                  "description": "Return pebbles ranked against a specific focus ID",
+                  "disabled": true
+                },
+                {
+                  "key": "poll_updates",
+                  "value": "true",
+                  "description": "Lightweight poll — skips embedding recomputation. Use for polling background score updates.",
+                  "disabled": true
+                }
+              ]
+            },
+            "description": "Fetch all pebbles for the authenticated user.\n\nQuery params:\n- `ranked=true` — returns pebbles ranked by relevance to the active focus\n- `focus_id` — rank against a specific focus\n- `poll_updates=true` — skip expensive recomputation, for polling score updates"
+          },
+          "response": [
+            {
+              "name": "Success (unranked)",
+              "status": "OK",
+              "code": 200,
+              "body": "[\n  {\n    \"id\": \"uuid\",\n    \"url\": \"https://example.com\",\n    \"title\": \"Example\",\n    \"created_at\": \"2026-03-31T00:00:00Z\"\n  }\n]"
+            },
+            {
+              "name": "Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{\n  \"error\": \"UNAUTHORIZED\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Delete pebble",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/pebbles/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "pebbles", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "UUID of the pebble to delete"
+                }
+              ]
+            },
+            "description": "Delete a pebble by ID. Only deletes pebbles owned by the authenticated user (enforced via Supabase RLS)."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true\n}"
+            },
+            {
+              "name": "Missing ID",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"Missing id param\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Focus",
+      "item": [
+        {
+          "name": "Set focus",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/focus",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "focus"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"statement\": \"I want to learn about distributed systems\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Set a new focus statement. The previous active focus is deactivated.\n\nThe focus is validated for safety before being saved. If unsafe, a 422 is returned with the rejection reason and suggested alternatives.\n\nAfter saving, pebbles are immediately ranked via embedding similarity (~200ms fast path). Full Claude-based enrichment happens in the background."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"data\": [\n    {\n      \"id\": \"uuid\",\n      \"title\": \"Distributed Systems Paper\",\n      \"score\": 0.91\n    }\n  ]\n}"
+            },
+            {
+              "name": "Unsafe focus",
+              "status": "Unprocessable Entity",
+              "code": 422,
+              "body": "{\n  \"ok\": false,\n  \"error\": \"UNSAFE_FOCUS\",\n  \"rejection_reason\": \"Focus contains harmful intent\",\n  \"alternatives\": [\n    \"Learn about network security fundamentals\",\n    \"Understand how firewalls work\"\n  ]\n}"
+            },
+            {
+              "name": "Invalid input",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"ok\": false,\n  \"error\": \"INVALID_INPUT\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get active focus",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/focus",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "focus"]
+            },
+            "description": "Returns the user's currently active focus statement, or `null` if none is set."
+          },
+          "response": [
+            {
+              "name": "Success (with focus)",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"data\": {\n    \"id\": \"uuid\",\n    \"statement\": \"I want to learn about distributed systems\",\n    \"created_at\": \"2026-03-31T00:00:00Z\"\n  }\n}"
+            },
+            {
+              "name": "Success (no focus)",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"data\": null\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI Tools",
+      "item": [
+        {
+          "name": "Get coach hint",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coach-hint",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coach-hint"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"focusStatement\": \"I want to learn about distributed systems\",\n  \"pebbles\": [\n    { \"title\": \"CAP Theorem Explained\", \"url\": \"https://example.com\" }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Generate an AI coaching hint based on the user's current focus and saved pebbles. Uses Claude to surface an actionable next step."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true,\n  \"data\": \"You have a strong set of articles on CAP theorem. Consider reading the Raft paper next to understand consensus algorithms in practice.\"\n}"
+            },
+            {
+              "name": "Invalid input",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"ok\": false,\n  \"error\": \"INVALID_INPUT\",\n  \"message\": \"focusStatement and pebbles are required\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Rescore pebbles",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/rescore",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rescore"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": { "raw": { "language": "json" } }
+            },
+            "description": "Trigger a full re-score of all pebbles against the active focus. Clears existing focus scores and recomputes them in the background.\n\nAlso backfills any pebbles that are missing embeddings.\n\nRequires an active focus to be set."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"ok\": true\n}"
+            },
+            {
+              "name": "No active focus",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"ok\": false,\n  \"error\": \"NO_ACTIVE_FOCUS\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Sign out",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/signout",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "signout"]
+            },
+            "description": "Sign the current user out. Invalidates the Supabase session."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"success\": true\n}"
+            },
+            {
+              "name": "Error",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{\n  \"error\": \"Session not found\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
