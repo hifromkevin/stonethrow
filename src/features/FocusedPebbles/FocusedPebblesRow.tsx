@@ -45,7 +45,7 @@ const FocusedPebbleRow = ({
     cleanTitle(pebble.title) || pebble.domain || pebble.canonical_url;
 
   return (
-    <article className="group grid grid-cols-[auto_1fr_auto] items-center gap-2 overflow-hidden bg-white hover:bg-slate-50">
+    <article className="group mb-2 grid grid-cols-[auto_1fr_auto] items-center gap-2 overflow-hidden rounded-xl border border-slate-200 bg-white hover:bg-slate-50">
       <figure className="aspect-square w-14 shrink-0 overflow-hidden">
         {pebble.image_url ? (
           <img
@@ -60,7 +60,7 @@ const FocusedPebbleRow = ({
         )}
       </figure>
 
-      <div className="min-w-0">
+      <div className="min-w-0 p-2">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0 py-1.5">
             <p className="truncate text-sm font-semibold text-slate-600">
