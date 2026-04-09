@@ -59,10 +59,10 @@ export async function POST(req: Request) {
     );
   }
 
-  // Step 2: Deactivate any existing active focus
+  // Step 2: Delete any existing active focus (cascades to pebble_focus_scores automatically)
   await supabase
     .from('focus_statements')
-    .update({ is_active: false, updated_at: new Date().toISOString() })
+    .delete()
     .eq('user_id', user.id)
     .eq('is_active', true);
 
