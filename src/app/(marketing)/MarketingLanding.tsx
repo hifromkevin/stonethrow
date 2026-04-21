@@ -9,8 +9,8 @@ const scrollToId = (id: string) =>
 
 const getAppLoginUrl = () => {
   const { hostname, port, protocol } = window.location;
-  const appHostname =
-    hostname === 'localhost' ? 'app.localhost' : `app.${hostname}`;
+  const base = hostname.replace(/^www\./, '');
+  const appHostname = hostname === 'localhost' ? 'app.localhost' : `app.${base}`;
   const portStr = port ? `:${port}` : '';
   return `${protocol}//${appHostname}${portStr}/login`;
 };
