@@ -2,12 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import useAuth from '@/lib/queries/useAuth';
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import CenteredComponent from '@/components/layout/CenteredComponent';
-import SignUpModal from '@/components/auth/SignUpModal';
 
 export default function LoginPage() {
   const { signIn } = useAuth();
@@ -17,7 +17,6 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showSignUp, setShowSignUp] = useState(false);
 
   const handleSignIn = async () => {
     setLoading(true);
@@ -36,8 +35,7 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <main className="flex min-h-screen w-screen items-center justify-center bg-slate-100">
+    <main className="flex min-h-screen w-screen items-center justify-center bg-slate-100">
         <CenteredComponent ariaLabel="login-card">
           <Card className="m-10 w-full max-w-xl">
             <div className="flex flex-col items-center px-6 py-6 text-center">
@@ -99,21 +97,17 @@ export default function LoginPage() {
                   disabled={loading}
                 />
               </form>
-              <footer className="mt-6 w-full">
-                <Button
-                  label="Don't have a Stonethrow account? Sign up"
-                  type="button"
-                  variant="secondary"
-                  overrides="w-full"
-                  clickFn={() => setShowSignUp(true)}
-                />
+              <footer className="mt-6 w-full text-center">
+                <p className="text-sm text-slate-500">
+                  Don&apos;t have an account?{' '}
+                  <Link href="/sign-up" className="text-slate-700 underline hover:text-slate-900">
+                    Sign up
+                  </Link>
+                </p>
               </footer>
             </div>
           </Card>
         </CenteredComponent>
-      </main>
-
-      <SignUpModal open={showSignUp} onClose={() => setShowSignUp(false)} />
-    </>
+    </main>
   );
 }

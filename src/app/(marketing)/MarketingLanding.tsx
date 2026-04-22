@@ -15,6 +15,14 @@ const getAppLoginUrl = () => {
   return `${protocol}//${appHostname}${portStr}/login`;
 };
 
+const getAppSignUpUrl = () => {
+  const { hostname, port, protocol } = window.location;
+  const base = hostname.replace(/^www\./, '');
+  const appHostname = hostname === 'localhost' ? 'app.localhost' : `app.${base}`;
+  const portStr = port ? `:${port}` : '';
+  return `${protocol}//${appHostname}${portStr}/sign-up`;
+};
+
 const MarketingLanding = () => {
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -74,7 +82,7 @@ const MarketingLanding = () => {
             type="button"
             className="cursor-pointer rounded-full border-0 bg-[#1b1b1b] px-[1.35rem] py-[0.55rem] [font-family:inherit] text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-[#333] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
             onClick={() => {
-              window.location.href = getAppLoginUrl();
+              window.location.href = getAppSignUpUrl();
             }}
           >
             Sign Up
@@ -109,7 +117,7 @@ const MarketingLanding = () => {
               type="button"
               className={btnPrimary}
               onClick={() => {
-                window.location.href = getAppLoginUrl();
+                window.location.href = getAppSignUpUrl();
               }}
             >
               Sign Up — It&apos;s Free
@@ -308,7 +316,7 @@ const MarketingLanding = () => {
           <button
             type="button"
             className="cursor-pointer rounded-full border-0 bg-[#3d9b8f] px-[2.75rem] py-4 [font-family:inherit] text-[1.05rem] font-semibold text-white shadow-[0_2px_16px_rgba(61,155,143,0.3)] transition-all duration-[250ms] hover:-translate-y-0.5 hover:bg-[#2e7d73] hover:shadow-[0_8px_28px_rgba(61,155,143,0.4)]"
-            onClick={() => (window.location.href = getAppLoginUrl())}
+            onClick={() => (window.location.href = getAppSignUpUrl())}
           >
             Sign Up — It&apos;s Free
           </button>
