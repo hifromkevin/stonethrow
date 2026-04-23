@@ -5,7 +5,7 @@ const NarrowComponent = ({
   adtlStyles?: string;
   children: React.ReactNode;
 }) => (
-  <main className={`mx-8 w-full max-w-4xl ${adtlStyles ? adtlStyles : ''}`}>
+  <main className={`mx-4 md:mx-8 w-full max-w-4xl ${adtlStyles ? adtlStyles : ''}`}>
     {children}
   </main>
 );
