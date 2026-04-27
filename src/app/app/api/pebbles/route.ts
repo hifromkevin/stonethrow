@@ -103,6 +103,19 @@ export async function GET(req: Request) {
     const focusId = url.searchParams.get('focus_id') ?? undefined;
     const ranked = url.searchParams.get('ranked');
     const pollUpdates = url.searchParams.get('poll_updates') === 'true';
+    const view = url.searchParams.get('view');
+
+    if (view === 'done') {
+      const { data, error } = await supabase
+        .from('pebbles')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_complete', true)
+        .order('completed_at', { ascending: false });
+
+      if (error) throw error;
+      return NextResponse.json(data ?? []);
+    }
 
     if (ranked === 'true' || focusId) {
       // For polling requests, we can skip expensive embedding recomputation

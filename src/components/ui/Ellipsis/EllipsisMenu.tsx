@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { Ellipsis } from 'lucide-react';
 import Portal from '@/components/ui/Portal';
 
 const EllipsisMenu = ({
@@ -11,6 +10,8 @@ const EllipsisMenu = ({
   url,
   onDelete,
   pebbleId,
+  onMarkComplete,
+  onUndoComplete,
 }: {
   rect: DOMRect | null;
   isOpen: boolean;
@@ -18,6 +19,8 @@ const EllipsisMenu = ({
   url: string;
   onDelete: (pebbleId: string) => void;
   pebbleId: string;
+  onMarkComplete?: () => void;
+  onUndoComplete?: () => void;
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -81,42 +84,31 @@ const EllipsisMenu = ({
           Go to link
         </a>
 
-        {/* <button
-          role="menuitem"
-          onClick={() => {
-            setIsOpen(false);
-            //TODO: Pin to Top action
-          }}
-          className="flex w-full items-center gap-3 px-4 py-2 hover:bg-slate-100"
-        >
-          <span className="w-4 text-center text-slate-500">↑</span>
-          <span>Pin to Top</span>
-        </button>
+        {onMarkComplete && (
+          <button
+            role="menuitem"
+            onClick={() => {
+              setIsOpen(false);
+              onMarkComplete();
+            }}
+            className="flex w-full items-center gap-3 px-4 py-2 hover:bg-slate-100"
+          >
+            Mark complete
+          </button>
+        )}
 
-        <button
-          role="menuitem"
-          onClick={() => {
-            setIsOpen(false);
-            //TODO: Mark Important action
-          }}
-          className="flex w-full items-center gap-3 px-4 py-2 hover:bg-slate-100"
-        >
-          <span className="w-4 text-center text-slate-500">☆</span>
-          <span>Mark Important</span>
-        </button>
-
-        <div className="my-2 h-px bg-slate-200" />
-
-        <button
-          role="menuitem"
-          onClick={() => {
-            setIsOpen(false);
-            //TODO: Mark Complete action
-          }}
-          className="flex w-full items-center gap-3 px-4 py-2 hover:bg-slate-100"
-        >
-          Mark complete
-        </button> */}
+        {onUndoComplete && (
+          <button
+            role="menuitem"
+            onClick={() => {
+              setIsOpen(false);
+              onUndoComplete();
+            }}
+            className="flex w-full items-center gap-3 px-4 py-2 hover:bg-slate-100"
+          >
+            Move to Active
+          </button>
+        )}
 
         <button
           role="menuitem"

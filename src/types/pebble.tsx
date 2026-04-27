@@ -17,6 +17,7 @@ export type Pebble = {
   group_color: string;
   is_starred: boolean;
   is_archived: boolean;
+  is_complete: boolean;
   image_url?: string;
 
   created_at: string;

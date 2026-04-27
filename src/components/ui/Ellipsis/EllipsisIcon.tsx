@@ -9,11 +9,15 @@ const EllipsisIcon = ({
   url,
   onDelete,
   pebbleId,
+  onMarkComplete,
+  onUndoComplete,
 }: {
   isDefault?: boolean;
   url: string;
   onDelete: (pebbleId: string) => void;
   pebbleId: string;
+  onMarkComplete?: () => void;
+  onUndoComplete?: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [rect, setRect] = useState<DOMRect | null>(null);
@@ -51,6 +55,8 @@ const EllipsisIcon = ({
           url={url}
           onDelete={onDelete}
           pebbleId={pebbleId}
+          onMarkComplete={onMarkComplete}
+          onUndoComplete={onUndoComplete}
         />
       )}
     </>

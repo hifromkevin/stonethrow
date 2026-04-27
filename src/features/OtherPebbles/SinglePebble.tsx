@@ -14,20 +14,32 @@ const SinglePebble = ({
   pebble,
   onDelete,
   explanation,
+  onMarkComplete,
 }: {
   pebble: Pebble;
   onDelete: (pebbleId: string) => void;
   explanation?: string;
+  onMarkComplete?: (pebbleId: string) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const domainLabel = pebble.domain
     ? `(${pebble.domain})`
     : pebble.canonical_url;
 
+  const handleMarkComplete = () => {
+    setIsCompleting(true);
+    setTimeout(() => {
+      onMarkComplete?.(pebble.id);
+    }, 200);
+  };
+
   return (
     <div
-      className="relative cursor-pointer opacity-60 transition-opacity duration-200 odd:bg-white even:bg-slate-50/40 hover:bg-slate-50/50 hover:opacity-100 md:cursor-default"
+      className={`relative cursor-pointer transition-all duration-200 odd:bg-white even:bg-slate-50/40 hover:bg-slate-50/50 md:cursor-default ${
+        isCompleting ? 'opacity-0 -translate-y-1' : 'opacity-60 hover:opacity-100'
+      }`}
       onClick={() => setIsExpanded((prev) => !prev)}
     >
       {/* grid-cols-[1fr_auto_auto]: content | info (? or ⌄) | ellipsis */}
@@ -76,6 +88,7 @@ const SinglePebble = ({
             url={pebble?.canonical_url}
             onDelete={onDelete}
             pebbleId={pebble.id}
+            onMarkComplete={onMarkComplete ? handleMarkComplete : undefined}
           />
         </div>
       </div>

@@ -8,10 +8,12 @@ const OtherPebbles = ({
   pebbles,
   onDelete,
   badgesMap,
+  onMarkComplete,
 }: {
   pebbles: Pebble[];
   onDelete: (pebbleId: string) => void;
   badgesMap?: Map<string, { badges: Badge[]; explanation?: string; score?: number }>;
+  onMarkComplete?: (pebbleId: string) => void;
 }) => (
   <NarrowComponent adtlStyles="my-8">
     <LocalHeading label="Other Pebbles" />
@@ -24,6 +26,7 @@ const OtherPebbles = ({
             key={`${pebble.id}-${idx}`}
             onDelete={onDelete}
             explanation={meta?.explanation}
+            onMarkComplete={onMarkComplete}
           />
         );
       })}

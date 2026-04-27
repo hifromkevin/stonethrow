@@ -1,3 +1,4 @@
+'use client';
 import { useState } from 'react';
 import { ChevronDown, Globe } from 'lucide-react';
 import { CircleQuestionMark } from 'lucide-react';
@@ -17,14 +18,17 @@ const FocusedPebbleRow = ({
   badges = [],
   explanation,
   rank,
+  onMarkComplete,
 }: {
   pebble: Pebble;
   onDelete: (pebbleId: string) => void;
   badges?: Badge[];
   explanation?: string;
   rank?: number;
+  onMarkComplete?: (pebbleId: string) => void;
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
 
   const displayTitle =
     cleanTitle(pebble.title) || pebble.domain || pebble.canonical_url;
@@ -33,9 +37,18 @@ const FocusedPebbleRow = ({
     ? `(${pebble.domain})`
     : pebble.canonical_url;
 
+  const handleMarkComplete = () => {
+    setIsCompleting(true);
+    setTimeout(() => {
+      onMarkComplete?.(pebble.id);
+    }, 200);
+  };
+
   return (
     <article
-      className="group mb-2 overflow-hidden rounded-xl border border-slate-200 bg-white hover:bg-slate-50 md:cursor-default cursor-pointer"
+      className={`group mb-2 overflow-hidden rounded-xl border border-slate-200 bg-white transition-all duration-200 md:cursor-default cursor-pointer ${
+        isCompleting ? 'opacity-0 -translate-y-1' : 'hover:bg-slate-50'
+      }`}
       onClick={() => setIsExpanded((prev) => !prev)}
     >
       {/* Main row */}
@@ -93,6 +106,7 @@ const FocusedPebbleRow = ({
             url={pebble?.canonical_url}
             onDelete={onDelete}
             pebbleId={pebble.id}
+            onMarkComplete={onMarkComplete ? handleMarkComplete : undefined}
           />
           {/* Mobile only: chevron */}
           <ChevronDown

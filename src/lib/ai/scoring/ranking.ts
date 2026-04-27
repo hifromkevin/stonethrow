@@ -60,6 +60,7 @@ export async function getRankedPebbles(
       `
       )
       .eq('user_id', userId)
+      .eq('is_complete', false)
       .order('created_at', { ascending: false });
 
     if (error || !pebbles) {
@@ -179,7 +180,8 @@ export async function getRankedPebbles(
       `
       )
       .in('id', pebbleIds)
-      .eq('user_id', userId);
+      .eq('user_id', userId)
+      .eq('is_complete', false);
     const fetchElapsed = Date.now() - fetchStartTime;
     console.log(
       `[RANKING_TIMING] Fetch pebble data for ${pebbleIds.length} pebbles: ${fetchElapsed}ms`
@@ -330,6 +332,7 @@ async function fallbackHaikuRanking(
     `
     )
     .eq('user_id', userId)
+    .eq('is_complete', false)
     .order('created_at', { ascending: false });
 
   if (error || !pebbles) {
