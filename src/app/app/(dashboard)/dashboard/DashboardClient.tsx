@@ -1,9 +1,12 @@
 'use client';
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import { useRouter, useSearchParams } from 'next/navigation';
+
 import usePebbles from '@/lib/queries/client/usePebbles';
 import useRankedPebbles from '@/lib/queries/client/useRankedPebbles';
 import useFocus from '@/lib/queries/useFocus';
+import useCompletedPebbles from '@/lib/queries/client/useCompletedPebbles';
 
 import CenteredComponent from '@/components/layout/CenteredComponent';
 import Header from '@/components/layout/Header';
@@ -18,9 +21,12 @@ import FocusedPebbles from '@/features/FocusedPebbles/FocusedPebbles';
 import LocalHeading from '@/components/layout/LocalHeading';
 import OtherPebbles from '@/features/OtherPebbles/OtherPebbles';
 import PebblesEmptyState from '@/features/PebblesEmptyState/PebblesEmptyState';
-import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebble';
+import PrimaryFocusPebble from '@/features/PrimaryFocusPebble/PrimaryFocusPebbleV2';
+import DoneQueue from '@/features/DoneQueue/DoneQueue';
 
 import useDeletePebble from '@/lib/mutations/useDeletePebble';
+import useMarkComplete from '@/lib/mutations/useMarkComplete';
+import useUndoComplete from '@/lib/mutations/useUndoComplete';
 import { needsBackgroundHint } from '@/lib/scoring/score-labels';
 
 import { FocusState } from '@/types';
@@ -36,12 +42,25 @@ const DashboardClient = () => {
   const [focusStatus, setFocusStatus] = useState<FocusState>('empty');
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
   const [isRescoring, setIsRescoring] = useState(false);
+  const [toast, setToast] = useState<{ pebbleId: string } | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const queryClient = useQueryClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentView = (searchParams.get('view') ?? 'active') as
+    | 'active'
+    | 'done';
+
+  const setView = (view: 'active' | 'done') => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('view', view);
+    router.replace(`?${params.toString()}`);
+  };
 
   const { data: focus } = useFocus();
   const focusId = focus?.id;
 
-  // Use ranked pebbles when focus is active, flat list otherwise
   const { data: rankedData, isLoading: rankedLoading } =
     useRankedPebbles(focusId);
 
@@ -68,6 +87,7 @@ const DashboardClient = () => {
       : rankedData;
 
   const { data: flatPebbles = [], isLoading: flatLoading } = usePebbles();
+  const { data: completedPebbles = [] } = useCompletedPebbles();
 
   const isLoading = focusId ? rankedLoading : flatLoading;
 
@@ -150,6 +170,14 @@ const DashboardClient = () => {
   const isScoring = rankedData?.scoringStatus?.isScoring ?? false;
   const scoringStuck = rankedData?.scoringStatus?.scoringStuck ?? false;
 
+  // Tab counts
+  const activeCount = focusId
+    ? (displayRankedData?.primary ? 1 : 0) +
+      (displayRankedData?.focused?.length ?? 0) +
+      (displayRankedData?.other?.length ?? 0)
+    : flatPebbles.length;
+  const doneCount = completedPebbles.length;
+
   // Collect focus sub-scores to detect when difficulty is the bottleneck
   const allSubScores = useMemo(() => {
     if (!focusId || !displayRankedData) return [];
@@ -216,14 +244,40 @@ const DashboardClient = () => {
 
   const deletePebble = useDeletePebble();
   const onDelete = (pebbleId: string) => {
-    if (!confirm('Remove this Pebble?')) return;
-
+    if (!confirm('Delete this pebble? This can\'t be undone.')) return;
     deletePebble.mutate(pebbleId);
   };
 
+  const markComplete = useMarkComplete();
+  const undoComplete = useUndoComplete();
+
+  const handleMarkComplete = useCallback(
+    (pebbleId: string) => {
+      markComplete.mutate(pebbleId);
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      setToast({ pebbleId });
+      toastTimerRef.current = setTimeout(() => setToast(null), 5000);
+    },
+    [markComplete]
+  );
+
+  const handleUndoMarkComplete = () => {
+    if (!toast) return;
+    undoComplete.mutate(toast.pebbleId);
+    setToast(null);
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+  };
+
+  const handleUndoComplete = useCallback(
+    (pebbleId: string) => {
+      undoComplete.mutate(pebbleId);
+    },
+    [undoComplete]
+  );
+
   return (
     <>
-      <main className="mt-18 mb-10 min-h-screen w-screen bg-white">
+      <main className="bg-[linear-gradient(to_bottom_right,#f8fafc,rgba(239,246,255,0.3),rgba(250,245,255,0.2))] mt-18 mb-10 min-h-screen w-screen">
         <Header />
         <CenteredComponent ariaLabel="focus-card">
           <FocusCard
@@ -232,132 +286,198 @@ const DashboardClient = () => {
           />
         </CenteredComponent>
 
-        <CenteredComponent ariaLabel="polite">
-          {isLoading && <div>Loading...</div>}
+        {/* Tabs */}
+        <CenteredComponent ariaLabel="view-tabs">
+          <NarrowComponent>
+            <div className="flex border-b border-slate-200">
+              <button
+                onClick={() => setView('active')}
+                className={`px-5 py-3 text-sm font-medium transition-colors ${
+                  currentView === 'active'
+                    ? 'border-b-2 border-teal-600 text-teal-700'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Active{activeCount > 0 ? ` ${activeCount}` : ''}
+              </button>
+              <button
+                onClick={() => setView('done')}
+                className={`px-5 py-3 text-sm font-medium transition-colors ${
+                  currentView === 'done'
+                    ? 'border-b-2 border-teal-600 text-teal-700'
+                    : 'text-slate-500 hover:text-slate-700'
+                }`}
+              >
+                Done{doneCount > 0 ? ` ${doneCount}` : ''}
+              </button>
+            </div>
+          </NarrowComponent>
         </CenteredComponent>
 
-        {!hasPebbles && !isLoading && (
-          <CenteredComponent ariaLabel="no-pebbles-state">
-            <PebblesEmptyState
-              hasFocus={focusStatus !== 'empty'}
-              onAddPebble={() => setIsModalOpen(true)}
+        {/* Done view */}
+        {currentView === 'done' && (
+          <CenteredComponent ariaLabel="done-queue">
+            <DoneQueue
+              pebbles={completedPebbles}
+              onDelete={onDelete}
+              onUndoComplete={handleUndoComplete}
             />
           </CenteredComponent>
         )}
 
-        {/* Loading indicator - shown only while waiting for initial ranked pebbles.
-            Enrichment (badges/explanations) fills in silently once pebbles are visible. */}
-        {isScoring && !hasPebbles && (
-          <CenteredComponent ariaLabel="scoring-loader">
-            <div className="mx-auto flex max-w-2xl flex-col items-center py-6">
-              <div className="mb-3 h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
-              <span className="text-sm font-medium text-gray-600">
-                {
-                  LOADING_MESSAGES[
-                    loadingMessageIndex % LOADING_MESSAGES.length
-                  ]
-                }
-                ...
-              </span>
-            </div>
-          </CenteredComponent>
-        )}
+        {/* Active view */}
+        {currentView === 'active' && (
+          <>
+            <CenteredComponent ariaLabel="polite">
+              {isLoading && <div>Loading...</div>}
+            </CenteredComponent>
 
-        {scoringStuck && (
-          <CenteredComponent ariaLabel="scoring-error">
-            <div className="mx-auto my-4 max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              Sorting couldn&apos;t complete — AI credits may be too low. Add
-              credits and re-save your focus to try again.
-            </div>
-          </CenteredComponent>
-        )}
+            {!hasPebbles && !isLoading && (
+              <CenteredComponent ariaLabel="no-pebbles-state">
+                <PebblesEmptyState
+                  hasFocus={focusStatus !== 'empty'}
+                  onAddPebble={() => setIsModalOpen(true)}
+                />
+              </CenteredComponent>
+            )}
 
-        {showBackgroundHint && (
-          <CenteredComponent ariaLabel="coach-hint">
-            <CoachHint
-              variant="background-context"
-              onAction={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-            />
-          </CenteredComponent>
-        )}
+            {/* Loading indicator - shown only while waiting for initial ranked pebbles.
+                Enrichment (badges/explanations) fills in silently once pebbles are visible. */}
+            {isScoring && !hasPebbles && (
+              <CenteredComponent ariaLabel="scoring-loader">
+                <div className="mx-auto flex max-w-2xl flex-col items-center py-6">
+                  <div className="mb-3 h-6 w-6 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+                  <span className="text-sm font-medium text-gray-600">
+                    {
+                      LOADING_MESSAGES[
+                        loadingMessageIndex % LOADING_MESSAGES.length
+                      ]
+                    }
+                    ...
+                  </span>
+                </div>
+              </CenteredComponent>
+            )}
 
-        {showCoachHint && (
-          <CenteredComponent ariaLabel="coach-hint">
-            <CoachHint focusStatement={focus.statement} pebbles={allPebbles} />
-          </CenteredComponent>
-        )}
+            {scoringStuck && (
+              <CenteredComponent ariaLabel="scoring-error">
+                <div className="mx-auto my-4 max-w-2xl rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  Sorting couldn&apos;t complete — AI credits may be too low. Add
+                  credits and re-save your focus to try again.
+                </div>
+              </CenteredComponent>
+            )}
 
-        {/* Pebbles - always visible; enrichment updates badges/explanations in-place */}
-        <div className="transition-opacity duration-300">
-          {hasPebbles && (
-            <>
-              {primaryPebble && (
-                <CenteredComponent>
-                  <PrimaryFocusPebble
-                    primaryFocusPebble={primaryPebble}
-                    onDelete={onDelete}
-                    badges={primaryBadges}
-                    explanation={primaryExplanation}
-                    rank={primaryRank}
-                    isScoring={isScoring}
-                  />
-                </CenteredComponent>
-              )}
+            {showBackgroundHint && (
+              <CenteredComponent ariaLabel="coach-hint">
+                <CoachHint
+                  variant="background-context"
+                  onAction={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                />
+              </CenteredComponent>
+            )}
 
-              {focusedPebblesList.length > 0 && (
+            {showCoachHint && (
+              <CenteredComponent ariaLabel="coach-hint">
+                <CoachHint
+                  focusStatement={focus.statement}
+                  pebbles={allPebbles}
+                />
+              </CenteredComponent>
+            )}
+
+            {/* Pebbles - always visible; enrichment updates badges/explanations in-place */}
+            <div className="transition-opacity duration-300">
+              {hasPebbles && (
                 <>
-                  <CenteredComponent ariaLabel="focused-pebbles">
-                    <NarrowComponent>
-                      <LocalHeading label="On Your Radar" />
-                    </NarrowComponent>
-                  </CenteredComponent>
+                  {primaryPebble && (
+                    <CenteredComponent>
+                      <PrimaryFocusPebble
+                        primaryFocusPebble={primaryPebble}
+                        onDelete={onDelete}
+                        badges={primaryBadges}
+                        explanation={primaryExplanation}
+                        rank={primaryRank}
+                        isScoring={isScoring}
+                        nextPebble={focusedPebblesList[0]}
+                        onMarkComplete={handleMarkComplete}
+                      />
+                    </CenteredComponent>
+                  )}
 
-                  <CenteredComponent ariaLabel="focused-pebbles-list">
-                    <FocusedPebbles
-                      savedPebbles={focusedPebblesList}
-                      onDelete={onDelete}
-                      badgesMap={focusedBadgesMap}
-                    />
-                  </CenteredComponent>
+                  {focusedPebblesList.length > 0 && (
+                    <>
+                      <CenteredComponent ariaLabel="focused-pebbles">
+                        <NarrowComponent>
+                          <LocalHeading label="On Your Radar" />
+                        </NarrowComponent>
+                      </CenteredComponent>
+
+                      <CenteredComponent ariaLabel="focused-pebbles-list">
+                        <FocusedPebbles
+                          savedPebbles={focusedPebblesList}
+                          onDelete={onDelete}
+                          badgesMap={focusedBadgesMap}
+                          onMarkComplete={handleMarkComplete}
+                        />
+                      </CenteredComponent>
+                    </>
+                  )}
+
+                  {otherPebblesList.length > 0 && (
+                    <CenteredComponent ariaLabel="other-pebbles">
+                      <OtherPebbles
+                        pebbles={otherPebblesList}
+                        onDelete={onDelete}
+                        badgesMap={otherBadgesMap}
+                        onMarkComplete={handleMarkComplete}
+                      />
+                    </CenteredComponent>
+                  )}
+
+                  {focusId && (
+                    <CenteredComponent ariaLabel="rescore">
+                      <div className="flex justify-center pb-4">
+                        <button
+                          onClick={handleRescore}
+                          disabled={isRescoring || isScoring}
+                          className="text-xs text-slate-400 hover:text-slate-600 disabled:opacity-40"
+                        >
+                          {isRescoring ? 'Re-scoring…' : 'Re-score pebbles'}
+                        </button>
+                      </div>
+                    </CenteredComponent>
+                  )}
                 </>
               )}
+            </div>
+          </>
+        )}
 
-              {otherPebblesList.length > 0 && (
-                <CenteredComponent ariaLabel="other-pebbles">
-                  <OtherPebbles
-                    pebbles={otherPebblesList}
-                    onDelete={onDelete}
-                    badgesMap={otherBadgesMap}
-                  />
-                </CenteredComponent>
-              )}
-
-              {focusId && (
-                <CenteredComponent ariaLabel="rescore">
-                  <div className="flex justify-center pb-4">
-                    <button
-                      onClick={handleRescore}
-                      disabled={isRescoring || isScoring}
-                      className="text-xs text-slate-400 hover:text-slate-600 disabled:opacity-40"
-                    >
-                      {isRescoring ? 'Re-scoring…' : 'Re-score pebbles'}
-                    </button>
-                  </div>
-                </CenteredComponent>
-              )}
-            </>
-          )}
-        </div>
         <div className="fixed right-6 bottom-6 xl:right-[calc(40%-40rem/2)]">
           <AddPebbleIcon handleClick={() => setIsModalOpen(true)} />
         </div>
       </main>
+
       <AddPebbleModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
       />
+
+      {/* Mark-complete toast */}
+      {toast && (
+        <div className="fixed bottom-20 left-1/2 z-50 flex -translate-x-1/2 items-center gap-3 rounded-lg bg-slate-800 px-4 py-3 text-sm text-white shadow-lg">
+          <span>Moved to Done</span>
+          <button
+            onClick={handleUndoMarkComplete}
+            className="font-semibold text-teal-300 hover:text-teal-100"
+          >
+            Undo
+          </button>
+        </div>
+      )}
     </>
   );
 };
