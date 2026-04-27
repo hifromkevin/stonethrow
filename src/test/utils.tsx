@@ -57,6 +57,7 @@ export function createMockPebble(overrides: Partial<Pebble> = {}): Pebble {
     status: 'inbox',
     ai_tags: [],
     is_upvoted: false,
+    is_complete: false,
     ...overrides,
   };
 }
