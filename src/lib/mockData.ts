@@ -9,6 +9,7 @@ const mockPebble = (overrides: Partial<Pebble> & { id: string; title: string; ca
   is_starred: false,
   is_archived: false,
   is_upvoted: false,
+  is_complete: false,
   status: 'active',
   ai_tags: [],
   created_at: new Date().toISOString(),
