@@ -167,7 +167,9 @@ export async function getRankedPebbles(
       return fallbackHaikuRanking(supabase, userId, focus);
     }
 
-    // Step 2: Fetch full pebble data for ranked IDs
+    // Step 2: Fetch ALL non-complete pebbles (not just embedding-ranked ones).
+    // New pebbles may not have embeddings yet and would be silently dropped if
+    // we only fetched by pebbleIds from the embedding search.
     const pebbleIds = embeddingRanks.map((r) => r.pebble_id);
     const fetchStartTime = Date.now();
     const { data: pebbles } = await supabase
@@ -179,12 +181,11 @@ export async function getRankedPebbles(
         pebble_focus_scores (*)
       `
       )
-      .in('id', pebbleIds)
       .eq('user_id', userId)
       .eq('is_complete', false);
     const fetchElapsed = Date.now() - fetchStartTime;
     console.log(
-      `[RANKING_TIMING] Fetch pebble data for ${pebbleIds.length} pebbles: ${fetchElapsed}ms`
+      `[RANKING_TIMING] Fetch pebble data for all pebbles: ${fetchElapsed}ms`
     );
 
     if (!pebbles) {
@@ -204,8 +205,9 @@ export async function getRankedPebbles(
       };
     }
 
-    // Step 3: Build ranked results, maintaining embedding order
-    // Also check for Haiku enrichment (focus_score) per pebble
+    // Step 3: Build ranked results, maintaining embedding order.
+    // Pebbles without embeddings are appended to the 'other' bucket below.
+    const embeddedPebbleIds = new Set(pebbleIds);
     const rankedPebbles = embeddingRanks
       .map((rank, index) => {
         const pebble = pebbles.find((p: any) => p.id === rank.pebble_id);
@@ -259,6 +261,28 @@ export async function getRankedPebbles(
         };
       })
       .filter((r) => r !== null) as RankedPebble[];
+
+    // Append pebbles that had no embedding (e.g. newly added) to the 'other' bucket
+    // so they always appear in the list even before their embedding is generated.
+    const unembeddedPebbles: RankedPebble[] = pebbles
+      .filter((p: any) => !embeddedPebbleIds.has(p.id))
+      .map((p: any) => {
+        const contentScore = p.pebble_content_scores?.[0] ?? null;
+        const focusScore =
+          p.pebble_focus_scores?.find((fs: any) => fs.focus_id === focus.id) ??
+          null;
+        return {
+          pebble: p as Pebble,
+          content_score: contentScore,
+          focus_score: focusScore,
+          final_score: 0,
+          bucket: 'other' as const,
+          badges: [],
+          explanation: undefined,
+          isEnriching: true,
+        };
+      });
+    rankedPebbles.push(...unembeddedPebbles);
 
     // Step 4: Track scoring status
     // "Enriching" = waiting for Haiku explanations for pebbles that don't have focus_score yet
