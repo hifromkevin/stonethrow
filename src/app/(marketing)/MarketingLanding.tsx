@@ -10,7 +10,8 @@ const scrollToId = (id: string) =>
 const getAppLoginUrl = () => {
   const { hostname, port, protocol } = window.location;
   const base = hostname.replace(/^www\./, '');
-  const appHostname = hostname === 'localhost' ? 'app.localhost' : `app.${base}`;
+  const appHostname =
+    hostname === 'localhost' ? 'app.localhost' : `app.${base}`;
   const portStr = port ? `:${port}` : '';
   return `${protocol}//${appHostname}${portStr}/login`;
 };
@@ -18,7 +19,8 @@ const getAppLoginUrl = () => {
 const getAppSignUpUrl = () => {
   const { hostname, port, protocol } = window.location;
   const base = hostname.replace(/^www\./, '');
-  const appHostname = hostname === 'localhost' ? 'app.localhost' : `app.${base}`;
+  const appHostname =
+    hostname === 'localhost' ? 'app.localhost' : `app.${base}`;
   const portStr = port ? `:${port}` : '';
   return `${protocol}//${appHostname}${portStr}/sign-up`;
 };
@@ -82,10 +84,10 @@ const MarketingLanding = () => {
             type="button"
             className="cursor-pointer rounded-full border-0 bg-[#1b1b1b] px-[1.35rem] py-[0.55rem] [font-family:inherit] text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-px hover:bg-[#333] hover:shadow-[0_4px_12px_rgba(0,0,0,0.15)]"
             onClick={() => {
-              window.location.href = getAppSignUpUrl();
+              window.location.href = getAppLoginUrl();
             }}
           >
-            Sign Up
+            Sign In
           </button>
         </div>
       </nav>
