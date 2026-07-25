@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next';
 
 import Providers from './providers';
 
+// @ts-ignore: side-effect import of CSS globals
 import './globals.css';
 
 const afacad = Afacad({
