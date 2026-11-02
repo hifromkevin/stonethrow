@@ -1,6 +1,10 @@
 # Stonethrow
 
-Stonethrow organizes, prioritizes, and helsp you act on saved content by allowing you to set a "focus", and organize your links by what matters most. 
+Stonethrow organizes, prioritizes, and helsp you act on saved content by allowing you to set a "focus", and organize your links by what matters most.
+
+![Stonethrow dashboard showing a current focus, the top-matched pebble, and ranked pebbles on your radar](stonethrow-ui.png)
+
+_The dashboard: pebbles ranked against your current focus, with the top match surfaced first._
 
 ## Core Concepts
 
