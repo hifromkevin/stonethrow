@@ -1,8 +1,6 @@
 # Stonethrow
 
-Organize, prioritize, and act on your saved content — powered by AI.
-
-Stonethrow helps you tame information overload. Save links, YouTube videos, articles, screenshots, and notes — then let AI summarize, categorize, and rank what you should look at next.
+Stonethrow organizes, prioritizes, and helsp you act on saved content by allowing you to set a "focus", and organize your links by what matters most. 
 
 ## Core Concepts
 
